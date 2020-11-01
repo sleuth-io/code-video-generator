@@ -16,7 +16,7 @@ example_dir = dirname(__file__)
 
 def title_scene(scene):
     scene.add_background(f"{example_dir}/resources/blackboard.jpg")
-    title = PangoText("How to use Manim and Code Videos", font="Helvetica")
+    title = PangoText("How to use Code Video Generator", font="Helvetica")
     scene.play(ShowCreation(title))
     scene.play(
         FadeIn(
@@ -34,7 +34,7 @@ def overview(scene):
     title = PangoText(
         """
     Manim is a Python library used to generate videos,
-    and Code Videos provides a base scene that makes it easy
+    and Code Video Generator provides a base scene that makes it easy
     to generate code walkthrough videos
     ... in fact, it is what was used to generate this video!
     """,
@@ -65,22 +65,22 @@ def demo_commenting(scene: CodeScene):
         title="examples/commented.py",
         path=f"{example_dir}/commented.py",
         keep_comments=True,
-        start_line=7,
-        end_line=20,
+        start_line=5,
+        end_line=18,
         reset_at_end=False,
     )
 
     scene.highlight_line(
         code,
-        number=6,
+        number=5,
         caption="These caption callouts are "
         "automatically generated from comments when "
         "using animate_code_comments()",
     )
     scene.highlight_lines(
         code,
-        start=9,
-        end=14,
+        start=13,
+        end=16,
         caption="You can also highlight multiple " "lines by ending the block with '# " "end'",
     )
     scene.highlight_none(code)
@@ -96,8 +96,8 @@ def demo_render_self(scene: CodeScene):
         title="examples/intro.py",
         path=f"{example_dir}/intro.py",
         keep_comments=True,
-        start_line=87,
-        end_line=103,
+        start_line=91,
+        end_line=107,
         reset_at_end=False,
     )
     # end
@@ -145,9 +145,9 @@ def demo_highlighting(scene: CodeScene):
 def goodbye(scene: CodeScene):
     title = PangoText(
         """
-        Try Code Videos today at:
+        Try Code Video Generator today at:
 
-          https://github.com/mrdon/code-videos
+          https://github.com/sleuth-io/code-video-generator
 
         Thanks for watching!""",
         font="Helvetica",
