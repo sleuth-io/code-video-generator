@@ -17,7 +17,7 @@ class CodeScene(MovingCameraScene):
         "text_font": "Helvetica",
         "code_theme": "fruity",
     }
-    
+
     def __init__(
         self,
         *args,

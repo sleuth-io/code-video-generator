@@ -30,6 +30,11 @@ class MyScene(CodeScene):
 manim video.py -ql -p
 ```
 
+It should look something like this:
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/I-Y__IJ_y90" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+
 ## Get involved
 
 If you'd like to contribute, feel free to fork or better yet, submit improvements as pull requests or report issues
