@@ -6,3 +6,6 @@ python:
       extra_requirements:
         - doc
   system_packages: true
+
+mkdocs:
+  configuration: mkdocs.yml
