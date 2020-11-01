@@ -32,5 +32,6 @@ manim video.py -ql -p
 
 ## Get involved
 
-If you'd like to contribute, feel free to fork or better yet, submit improvements as pull requests or report issues.
+If you'd like to contribute, feel free to fork or better yet, submit improvements as pull requests or report issues
+ at [sleuth-io/code-video-generator](https://github.com/sleuth-io/code-video-generator).
 

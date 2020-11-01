@@ -7,4 +7,5 @@ theme:
 nav:
     - Home: index.md
     - Installation: installation.md
+    - GitHub: https://github.com/sleuth-io/code-video-generator
     - About: about.md

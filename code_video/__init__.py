@@ -12,17 +12,19 @@ from code_video.music import fit_audio
 
 
 class CodeScene(MovingCameraScene):
+    CONFIG = {
+        "code_font": "Ubuntu Mono",
+        "text_font": "Helvetica",
+        "code_theme": "fruity",
+    }
+    
     def __init__(
         self,
-        code_font: str = "Ubuntu Mono",
-        text_font: str = "Helvetica",
         *args,
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
         self.caption = None
-        self.code_font = code_font
-        self.text_font = text_font
         self.col_width = self.camera_frame.get_width() / 3
         self.music: Optional[BackgroundMusic] = None
 
@@ -71,7 +73,7 @@ class CodeScene(MovingCameraScene):
 
         parent = None
         if title:
-            title = PangoText(title, font=self.text_font).to_edge(edge=UP)
+            title = PangoText(title, font=self.CONFIG["text_font"]).to_edge(edge=UP)
             self.add(title)
             code_group = VGroup().next_to(title, direction=DOWN)
             self.add(code_group)
@@ -115,7 +117,7 @@ class CodeScene(MovingCameraScene):
                 self.play(ApplyMethod(tex.to_edge))
 
             self.caption = PangoText(
-                caption, font=self.text_font, size=self.col_width / 10 * 0.9
+                caption, font=self.CONFIG["text_font"], size=self.col_width / 10 * 0.9
             ).add_background_rectangle(buff=MED_SMALL_BUFF)
             self.caption.next_to(tex, RIGHT)
             self.caption.align_to(tex.line_numbers[start - 1], UP)
@@ -159,7 +161,7 @@ class CodeScene(MovingCameraScene):
         return self.highlight_lines(tex, 1, len(tex.code) + 1, caption=None)
 
     def create_code(self, path: str, **kwargs) -> Code:
-        tex = Code(path, font=self.code_font, style="paraiso-dark", **kwargs)
+        tex = Code(path, font=self.CONFIG["code_font"], style=self.CONFIG["code_theme"], **kwargs)
         x_scale = (self.col_width * 2) / tex.get_width()
         y_scale = self.camera_frame.get_height() * 0.95 / tex.get_height()
         tex.scale(min(x_scale, y_scale))

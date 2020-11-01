@@ -66,22 +66,22 @@ def demo_commenting(scene: CodeScene):
         title="examples/commented.py",
         path=f"{example_dir}/commented.py",
         keep_comments=True,
-        start_line=5,
-        end_line=18,
+        start_line=6,
+        end_line=19,
         reset_at_end=False,
     )
 
     scene.highlight_line(
         code,
-        number=5,
+        number=6,
         caption="These caption callouts are "
         "automatically generated from comments when "
         "using animate_code_comments()",
     )
     scene.highlight_lines(
         code,
-        start=13,
-        end=16,
+        start=14,
+        end=17,
         caption="You can also highlight multiple " "lines by ending the block with '# " "end'",
     )
     scene.highlight_none(code)
@@ -97,8 +97,8 @@ def demo_render_self(scene: CodeScene):
         title="examples/intro.py",
         path=f"{example_dir}/intro.py",
         keep_comments=True,
-        start_line=91,
-        end_line=107,
+        start_line=92,
+        end_line=108,
         reset_at_end=False,
     )
     # end
@@ -126,18 +126,18 @@ def demo_highlighting(scene: CodeScene):
     scene.play(ShowCreation(tex))
     scene.highlight_line(
         tex,
-        10,
+        11,
         caption="Create code blocks yourself and pass in any arguments the Code class supports to do things "
         "like change the theme or font",
     )
     scene.highlight_lines(
         tex,
-        12,
-        18,
+        13,
+        19,
         caption="Highlight code with a caption to give extra information. A wait is"
         " automatically added for a time based on the length of the caption",
     )
-    scene.highlight_line(tex, 20, caption="Reset highlighting and positioning")
+    scene.highlight_line(tex, 21, caption="Reset highlighting and positioning")
     scene.highlight_none(tex)
     scene.play(FadeOut(tex))
     scene.clear()
