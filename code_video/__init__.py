@@ -33,11 +33,11 @@ class CodeScene(MovingCameraScene):
 
     def tear_down(self):
         super().tear_down()
-        self.time = 0
-        file = fit_audio(self.music.file, self.renderer.time + 2)
-
-        self.add_sound(file)
-        os.remove(file)
+        if self.music:
+            self.time = 0
+            file = fit_audio(self.music.file, self.renderer.time + 2)
+            self.add_sound(file)
+            os.remove(file)
 
     def wait_until_beat(self, wait_time: Union[float, int]):
         if self.music:

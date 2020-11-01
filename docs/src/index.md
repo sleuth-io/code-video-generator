@@ -13,14 +13,14 @@ Code Video Generator is a library for [Manim](https://github.com/manimcommunity/
 ## Quickstart
 
 1. [Install](installation.html) Manim and code-video-generator
-1. Create a simple scene to show a file, say `video.py`:
+1. Create a simple scene to show a file, say `simple.py`:
 ```
 from code_video import CodeScene
 
 class MyScene(CodeScene):
     def construct(self):
         # This does the actual code display and animation
-        self.animate_code_comments("video.py")
+        self.animate_code_comments("simple.py")
     
         # Wait 5 seconds before finishing
         self.wait(5)

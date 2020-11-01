@@ -18,13 +18,13 @@ from code_video import CodeScene
 class MyScene(CodeScene):
     def construct(self):
         # This does the actual code display and animation
-        self.animate_code_comments("video.py")
+        self.animate_code_comments("simple.py")
     
         # Wait 5 seconds before finishing
         self.wait(5)
 ```
 
-Save this code in a file called `video.py`. Now open your terminal in the
+Save this code in a file called `simple.py`. Now open your terminal in the
 folder where you saved the file and execute
 
 ```sh
