@@ -1,19 +1,63 @@
+import os
 from tempfile import NamedTemporaryFile
 from textwrap import wrap
-from typing import Optional, Callable, List
+from typing import Optional, Callable, List, Union
 
 from manim import *
 
 from code_video import comment_parser
+from code_video.music import BackgroundMusic, fit_audio
 
 
 class CodeScene(MovingCameraScene):
-    def __init__(self, code_font: str = "Ubuntu Mono", text_font: str = "Helvetica", *args, **kwargs):
+    def __init__(
+        self,
+        code_font: str = "Ubuntu Mono",
+        text_font: str = "Helvetica",
+        *args,
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
         self.caption = None
         self.code_font = code_font
         self.text_font = text_font
         self.col_width = self.camera_frame.get_width() / 3
+        self.music: Optional[BackgroundMusic] = None
+
+    def add_background_music(self, path: str):
+        self.music = BackgroundMusic(path)
+
+    def tear_down(self):
+        super().tear_down()
+        self.time = 0
+        file = fit_audio(self.music.file, self.renderer.time + 2)
+
+        self.add_sound(file)
+        os.remove(file)
+
+    def wait_until_beat(self, wait_time: Union[float, int]):
+        if self.music:
+            adjusted_delay = (
+                self.music.next_beat(self.renderer.time + wait_time)
+                - self.renderer.time
+            )
+            self.wait(adjusted_delay)
+        else:
+            self.wait(wait_time)
+
+    def wait_until_measure(
+        self, wait_time: Union[float, int], post: Union[float, int] = 0
+    ):
+        if self.music:
+            adjusted_delay = (
+                self.music.next_measure(self.renderer.time + wait_time)
+                - self.renderer.time
+            )
+            adjusted_delay += post
+            self.wait(adjusted_delay)
+
+        else:
+            self.wait(wait_time)
 
     def add_background(self, path: str) -> ImageMobject:
         background = ImageMobject(path, height=self.camera_frame.get_height())
@@ -21,11 +65,27 @@ class CodeScene(MovingCameraScene):
         self.add(background)
         return background
 
-    def animate_code_comments(self, path: str, keep_comments: bool = False, start_line: int = 1, end_line: Optional[
-        int] = None, reset_at_end: bool = True, parent: Optional[Mobject] = None) -> Code:
+    def animate_code_comments(
+        self,
+        path: str,
+        title: str = None,
+        keep_comments: bool = False,
+        start_line: int = 1,
+        end_line: Optional[int] = None,
+        reset_at_end: bool = True,
+    ) -> Code:
 
-        code, comments = comment_parser.parse(path, keep_comments=keep_comments, start_line=start_line,
-                                              end_line=end_line)
+        parent = None
+        if title:
+            title = PangoText(title, font=self.text_font).to_edge(edge=UP)
+            self.add(title)
+            code_group = VGroup().next_to(title, direction=DOWN)
+            self.add(code_group)
+            parent = code_group
+
+        code, comments = comment_parser.parse(
+            path, keep_comments=keep_comments, start_line=start_line, end_line=end_line
+        )
 
         with NamedTemporaryFile(suffix=f".{path.split('.')[-1]}") as f:
             f.writelines([line.encode() for line in code])
@@ -97,7 +157,7 @@ class CodeScene(MovingCameraScene):
 
         if caption:
             wait_time = len(caption) / (200 * 5 / 60)
-            self.wait(wait_time)
+            self.wait_until_measure(wait_time, -1.5)
         self.play(*post_actions)
 
     def highlight_line(

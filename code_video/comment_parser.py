@@ -25,8 +25,9 @@ class Comment:
         return "\n".join(self.lines)
 
 
-def parse(path: str, keep_comments: bool, start_line: int, end_line: Optional[
-        int]) -> Tuple[List[str], List[Comment]]:
+def parse(
+    path: str, keep_comments: bool, start_line: int, end_line: Optional[int]
+) -> Tuple[List[str], List[Comment]]:
     code: List[str] = []
     comments: List[Comment] = []
     lexer = get_lexer_for_filename(path)
@@ -36,10 +37,10 @@ def parse(path: str, keep_comments: bool, start_line: int, end_line: Optional[
 
     with open(path, "r") as f:
         comment = Comment()
-        lines = f.readlines()[start_line - 1:]
+        lines = f.readlines()[start_line - 1 :]
 
     if end_line and start_line - end_line < len(lines):
-        lines = lines[:end_line - start_line + 1]
+        lines = lines[: end_line - start_line + 1]
     for line in lines:
         stripped = line.strip()
         if stripped.startswith(f"{comment_marker} end"):

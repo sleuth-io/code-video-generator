@@ -1,0 +1,11 @@
+name: Automations
+
+on: [push, pull_request, pull_request_review, check_run, label]
+
+jobs:
+  run-sleuth-pr:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: docker://mrdonbrown/sleuth-pr-dev:latest
+      env:
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
