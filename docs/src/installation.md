@@ -9,3 +9,4 @@ Once Manim is installed, you can simply install code-video-generator using pip:
 pip install code-video-generator
 ```
 
+Note: You may need to install manimmc from source in order to get the [comment bug fix](https://github.com/ManimCommunity/manim/issues/638). 
