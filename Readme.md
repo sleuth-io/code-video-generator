@@ -35,8 +35,7 @@ You should see your video player pop up and play a simple walkthrough of `video.
  examples in the
 [GitHub repository](https://github.com/sleuth-io/code-video-generator/tree/master/examples).
 
-For more information on Manim, see their [ReadTheDocs](https://manimce.readthedocs.io/en
-/latest/).
+For more information on Manim, see their [ReadTheDocs](https://manimce.readthedocs.io/en/latest/).
 
 ## Contributing
 
