@@ -33,6 +33,7 @@ jobs:
     - name: Check format and linters
       run: |
         make check-format
-    - name: Test with pytest
-      run: |
-        pytest
+# No tests yet :(
+#    - name: Test with pytest
+#      run: |
+#        pytest
