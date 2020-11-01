@@ -1,12 +1,13 @@
 import os
+from code_video import comment_parser
+from code_video.music import BackgroundMusic
+from code_video.music import fit_audio
 from tempfile import NamedTemporaryFile
 from textwrap import wrap
-from typing import Optional, Callable, List, Union
+from typing import Optional
+from typing import Union
 
 from manim import *
-
-from code_video import comment_parser
-from code_video.music import BackgroundMusic, fit_audio
 
 
 class CodeScene(MovingCameraScene):
@@ -37,22 +38,14 @@ class CodeScene(MovingCameraScene):
 
     def wait_until_beat(self, wait_time: Union[float, int]):
         if self.music:
-            adjusted_delay = (
-                self.music.next_beat(self.renderer.time + wait_time)
-                - self.renderer.time
-            )
+            adjusted_delay = self.music.next_beat(self.renderer.time + wait_time) - self.renderer.time
             self.wait(adjusted_delay)
         else:
             self.wait(wait_time)
 
-    def wait_until_measure(
-        self, wait_time: Union[float, int], post: Union[float, int] = 0
-    ):
+    def wait_until_measure(self, wait_time: Union[float, int], post: Union[float, int] = 0):
         if self.music:
-            adjusted_delay = (
-                self.music.next_measure(self.renderer.time + wait_time)
-                - self.renderer.time
-            )
+            adjusted_delay = self.music.next_measure(self.renderer.time + wait_time) - self.renderer.time
             adjusted_delay += post
             self.wait(adjusted_delay)
 
@@ -102,9 +95,7 @@ class CodeScene(MovingCameraScene):
             self.highlight_none(tex)
         return tex
 
-    def highlight_lines(
-        self, tex: Code, start: int = 1, end: int = -1, caption: Optional[str] = None
-    ):
+    def highlight_lines(self, tex: Code, start: int = 1, end: int = -1, caption: Optional[str] = None):
         if end == -1:
             end = len(tex.line_numbers) + 1
 
@@ -160,9 +151,7 @@ class CodeScene(MovingCameraScene):
             self.wait_until_measure(wait_time, -1.5)
         self.play(*post_actions)
 
-    def highlight_line(
-        self, tex: Code, number: int = -1, caption: Optional[str] = None
-    ):
+    def highlight_line(self, tex: Code, number: int = -1, caption: Optional[str] = None):
         return self.highlight_lines(tex, number, number, caption=caption)
 
     def highlight_none(self, tex: Code):

@@ -1,7 +1,7 @@
+from code_video import CodeScene
 from os.path import dirname
 
 from manim import *
-from code_video import CodeScene
 
 
 class HighlightScene(CodeScene):

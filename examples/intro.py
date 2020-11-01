@@ -1,9 +1,15 @@
+from code_video import CodeScene
 from os.path import dirname
 
-from manim import *
-
-from code_video import CodeScene
-
+from manim import DOWN
+from manim import FadeIn
+from manim import FadeOut
+from manim import LARGE_BUFF
+from manim import LEFT
+from manim import linear
+from manim import MED_LARGE_BUFF
+from manim import PangoText
+from manim import ShowCreation
 
 example_dir = dirname(__file__)
 
@@ -27,8 +33,8 @@ def title_scene(scene):
 def overview(scene):
     title = PangoText(
         """
-    Manim is a Python library used to generate videos, 
-    and Code Videos provides a base scene that makes it easy 
+    Manim is a Python library used to generate videos,
+    and Code Videos provides a base scene that makes it easy
     to generate code walkthrough videos
     ... in fact, it is what was used to generate this video!
     """,
@@ -75,9 +81,7 @@ def demo_commenting(scene: CodeScene):
         code,
         start=9,
         end=14,
-        caption="You can also highlight multiple "
-        "lines by ending the block with '# "
-        "end'",
+        caption="You can also highlight multiple " "lines by ending the block with '# " "end'",
     )
     scene.highlight_none(code)
     scene.play(FadeOut(code))
@@ -106,7 +110,7 @@ def demo_render_self(scene: CodeScene):
 def demo_highlighting(scene: CodeScene):
     title = PangoText(
         """
-        If you want more control, you can create code blocks and 
+        If you want more control, you can create code blocks and
         highlight them manually.
         """,
         font="Helvetica",
@@ -142,9 +146,9 @@ def goodbye(scene: CodeScene):
     title = PangoText(
         """
         Try Code Videos today at:
-        
+
           https://github.com/mrdon/code-videos
-          
+
         Thanks for watching!""",
         font="Helvetica",
         line_spacing=0.5,
@@ -156,9 +160,7 @@ def goodbye(scene: CodeScene):
 
 class Main(CodeScene):
     def construct(self):
-        self.add_background_music(
-            f"{example_dir}/resources/Pure Magic - Chris Haugen.mp3"
-        )
+        self.add_background_music(f"{example_dir}/resources/Pure Magic - Chris Haugen.mp3")
         title_scene(self)
         overview(self)
         demo_commenting(self)

@@ -1,11 +1,8 @@
-from typing import List, Tuple, Optional
+from typing import List
+from typing import Optional
+from typing import Tuple
 
-from pygments.lexers import (
-    guess_lexer,
-    guess_lexer_for_filename,
-    get_lexer_for_filename,
-)
-from pygments.token import Comment as CommentToken
+from pygments.lexers import get_lexer_for_filename
 
 
 class Comment:

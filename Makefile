@@ -1,4 +1,4 @@
-.PHONY: help pyenv run format clean
+.PHONY: help pyenv run format clean check-format lint docs
 
 # Help system from https://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
 .DEFAULT_GOAL := help
@@ -13,7 +13,26 @@ pyenv: ## Install and setup local py env
 clean: pyenv ## Clean the project and set everything up
 
 run: ## Generate the video and preview
-	manim main.py CodeSceneDemo  -ql -p
+	manim examples/commented.py -ql -p
+
+lint: ## Run Python linters
+	flake8 examples
+	flake8 code_video
+	pylint examples
+	pylint code_video
+
+check-format: lint ## Check Python code formatting
+	black examples --check --target-version py38
+	black code_video --check --target-version py38
+	reorder-python-imports --py38-plus `find code_video -name "*.py"`
+	reorder-python-imports --py38-plus `find examples -name "*.py"`
+
+docs: ## Serve the docs
+	mkdocs serve -a localhost:8035
+
 
 format: ## Format Python code
-	black . --target-version py38
+	black code_video --target-version py38
+	black examples --target-version py38
+	reorder-python-imports --py38-plus `find examples -name "*.py"` || black examples --target-version py38
+	reorder-python-imports --py38-plus `find code_video -name "*.py"` || black code_video --target-version py38
