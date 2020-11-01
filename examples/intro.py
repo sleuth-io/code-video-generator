@@ -1,4 +1,3 @@
-from code_video import CodeScene
 from os.path import dirname
 
 from manim import DOWN
@@ -10,6 +9,8 @@ from manim import linear
 from manim import MED_LARGE_BUFF
 from manim import PangoText
 from manim import ShowCreation
+
+from code_video import CodeScene
 
 example_dir = dirname(__file__)
 

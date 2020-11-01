@@ -1,5 +1,6 @@
-from code_video import CodeScene
 from os.path import dirname
+
+from code_video import CodeScene
 
 
 # Use the CodeScene to get the extra helper methods

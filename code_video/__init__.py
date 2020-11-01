@@ -1,13 +1,14 @@
 import os
-from code_video import comment_parser
-from code_video.music import BackgroundMusic
-from code_video.music import fit_audio
 from tempfile import NamedTemporaryFile
 from textwrap import wrap
 from typing import Optional
 from typing import Union
 
 from manim import *
+
+from code_video import comment_parser
+from code_video.music import BackgroundMusic
+from code_video.music import fit_audio
 
 
 class CodeScene(MovingCameraScene):
