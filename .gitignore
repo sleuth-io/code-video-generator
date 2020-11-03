@@ -2,3 +2,4 @@ media/
 venv/
 __pycache__/
 .eggs/
+pip-wheel-metadata/
