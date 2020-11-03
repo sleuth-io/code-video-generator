@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from manim import Scene
 
 from code_video import SequenceDiagram
