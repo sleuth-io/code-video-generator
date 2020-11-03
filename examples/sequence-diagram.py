@@ -11,6 +11,8 @@ class SequenceDiagramsScene(Scene):
         with browser:
             with web.text("Make a request"):
                 with app.text("Retrieve a json object"):
+                    app.note("Do some thinking")
+                    app.note("Do lots and lots and lots of thinking")
                     app.ret("Value from db")
                 web.ret("HTML response")
 
