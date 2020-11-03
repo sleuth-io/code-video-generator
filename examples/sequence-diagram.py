@@ -1,11 +1,13 @@
-from manim import Scene
+from os.path import dirname
 
+from code_video import CodeScene
 from code_video import SequenceDiagram
 
 
-class SequenceDiagramsScene(Scene):
+class SequenceDiagramsScene(CodeScene):
     def construct(self):
-
+        example_dir = dirname(__file__)
+        self.add_background(f"{example_dir}/resources/blackboard.jpg")
         diagram = SequenceDiagram()
         browser, web, app = diagram.add_objects("Browser", "Web", "App")
         with browser:
