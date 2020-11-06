@@ -27,6 +27,7 @@ class CodeScene(MovingCameraScene):
         self.caption = None
         self.col_width = self.camera_frame.get_width() / 3
         self.music: Optional[BackgroundMusic] = None
+        self.pauses = []
 
     def add_background_music(self, path: str):
         self.music = BackgroundMusic(path)
@@ -38,6 +39,18 @@ class CodeScene(MovingCameraScene):
             file = fit_audio(self.music.file, self.renderer.time + 2)
             self.add_sound(file)
             os.remove(file)
+
+        if self.pauses:
+            config["slide_videos"] = self.renderer.file_writer.partial_movie_files[:]
+            config["slide_stops"].extend(self.pauses)
+            config["movie_file_path"] = self.renderer.file_writer.movie_file_path
+
+    def wait(self, duration=DEFAULT_WAIT_TIME, stop_condition=None):
+        if config.get("show_slides"):
+            print("In slide mode, skipping wait")
+            self.pauses.append(len(self.renderer.file_writer.partial_movie_files) - 1)
+        else:
+            super().wait(duration, stop_condition)
 
     def wait_until_beat(self, wait_time: Union[float, int]):
         if self.music:
@@ -90,6 +103,7 @@ class CodeScene(MovingCameraScene):
             if parent:
                 parent.add(tex)
         self.play(ShowCreation(tex))
+        self.wait()
 
         for comment in comments:
             self.highlight_lines(tex, comment.start, comment.end, comment.caption)
@@ -146,13 +160,18 @@ class CodeScene(MovingCameraScene):
             for line_no in range(len(tex.code))
         ]
 
-        self.play(*pre_actions)
-        self.play(*actions)
+        if pre_actions:
+            self.play(*pre_actions)
+
+        if actions:
+            self.play(*actions)
 
         if caption:
             wait_time = len(caption) / (200 * 5 / 60)
             self.wait_until_measure(wait_time, -1.5)
-        self.play(*post_actions)
+
+        if post_actions:
+            self.play(*post_actions)
 
     def highlight_line(self, tex: Code, number: int = -1, caption: Optional[str] = None):
         return self.highlight_lines(tex, number, number, caption=caption)

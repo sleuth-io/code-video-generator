@@ -13,7 +13,7 @@ class CommentedScene(CodeScene):
 
         # Display the code and animate comments as highlighted lines. For more control, use
         # highlight_line(s) directly.
-        self.animate_code_comments(f"{example_dir}/commented.py", keep_comments=True, start_line=5, end_line=16)
+        self.animate_code_comments(f"{example_dir}/commented.py", keep_comments=True, start_line=6, end_line=17)
         # end
 
         self.wait(5)
