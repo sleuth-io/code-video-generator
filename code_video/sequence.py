@@ -19,12 +19,13 @@ from manim import ShowCreation
 from manim import Text
 from manim import UP
 from manim import VGroup
+from manim import WHITE
 from manim.mobject.geometry import DEFAULT_DASH_LENGTH
+from manim.mobject.geometry import Polygon
 from numba import np
 
 
 class Actor(VGroup):
-
     CONFIG = {
         "text_font": "Helvetica",
         "actor_fill_color": BLUE,
@@ -89,6 +90,22 @@ class Actor(VGroup):
         else:
             self.diagram.interactions.append(note_interaction)
 
+    def to_self(self, value: str):
+        note_interaction = SelfArrow(self, value)
+        interaction = self.diagram.interactions[-1]
+        if not interaction.target:
+            self.diagram.interactions.insert(-1, note_interaction)
+        else:
+            self.diagram.interactions.append(note_interaction)
+
+    def to_target(self, value: str, target: Actor):
+        note_interaction = Interaction(source=self, label=value).finish(target)
+        interaction = self.diagram.interactions[-1]
+        if not interaction.target:
+            self.diagram.interactions.insert(-1, note_interaction)
+        else:
+            self.diagram.interactions.append(note_interaction)
+
     def ret(self, value):
         interaction = self.diagram.interactions[-1]
         if not interaction.target:
@@ -108,11 +125,11 @@ class Actor(VGroup):
 
 
 class Interaction(VGroup):
-    def __init__(self, source: Actor, **kwargs):
+    def __init__(self, source: Actor, label: str = "", target: Optional[Actor] = None, **kwargs):
         super().__init__(**kwargs)
         self.source = source
-        self.target: Optional[Actor] = None
-        self.label: str = ""
+        self.target = target
+        self.label = label
 
     def finish(self, target: Actor):
         self.target = target
@@ -121,6 +138,7 @@ class Interaction(VGroup):
         self.add(line)
         text = Text(self.label, font=self.source.CONFIG["text_font"]).scale(0.7).next_to(line, direction=UP, buff=0)
         self.add(text)
+        return self
 
     def scale(self, scale_factor, **kwargs):
         super().scale(scale_factor, **kwargs)
@@ -141,9 +159,16 @@ class Note(Interaction):
 
         block = VGroup()
         title = Text(self.label, font="Helvetica").scale(0.7)
-        rect = Rectangle(height=title.get_height() + 0.3, width=title.get_width() + 0.3)
-        title.move_to(rect)
-        block.add(rect, title)
+
+        ear_size = title.get_width() * 0.08
+        w = title.get_width() + 0.3 * 2
+        h = title.get_height() + 0.3
+        border = Polygon(
+            (0, h, 0), (w - ear_size, h, 0), (w, h - ear_size, 0), (w, 0, 0), (0, 0, 0), (0, h, 0), color=WHITE
+        )
+
+        title.move_to(border)
+        block.add(border, title)
         block.next_to(target.get_center(), direction)
         self.add(block)
 
@@ -151,6 +176,52 @@ class Note(Interaction):
         for obj in self.submobjects:
             obj.scale(scale_factor, **kwargs)
             obj.next_to(self.source.get_center(), direction=self.direction)
+        return self
+
+    def finish(self, target: Actor):
+        raise NotImplementedError()
+
+
+class SelfArrow(Interaction):
+    def __init__(self, target: Actor, label: str):
+        super().__init__(target)
+        self.target = target
+        self.label = "\n".join(wrap(label, 30))
+
+        line_block = VGroup()
+
+        spacing = 0.4
+        distance = 0.8
+        line = Polygon(
+            [target.get_center()[0], spacing, 0],
+            [target.get_center()[0] + distance, spacing, 0],
+            [target.get_center()[0] + distance, -1 * spacing, 0],
+            [target.get_center()[0] + distance / 2, -1 * spacing, 0],
+            [target.get_center()[0] + distance, -1 * spacing, 0],
+            [target.get_center()[0] + distance, spacing, 0],
+            [target.get_center()[0], spacing, 0],
+            color=WHITE,
+        )
+
+        arrow = Arrow(
+            start=[target.get_center()[0] + distance, -1 * spacing, 0],
+            end=[target.get_center()[0], -1 * spacing, 0],
+            buff=0,
+        )
+        line_block.add(line, arrow)
+
+        title = Text(self.label, font="Helvetica").scale(0.7)
+        title.next_to(line_block)
+
+        block = VGroup()
+        block.add(line_block, title)
+        block.next_to(target.get_center(), RIGHT)
+        self.add(block)
+
+    def scale(self, scale_factor, **kwargs):
+        for obj in self.submobjects:
+            obj.scale(scale_factor, **kwargs)
+            obj.next_to(self.source.get_center(), direction=RIGHT, buff=0)
         return self
 
     def finish(self, target: Actor):

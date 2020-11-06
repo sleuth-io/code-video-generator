@@ -12,8 +12,9 @@ class SequenceDiagramsScene(CodeScene):
         browser, web, app = diagram.add_objects("Browser", "Web", "App")
         with browser:
             with web.text("Make a request"):
+                web.to_target("Do a quick thing", app)
                 with app.text("Retrieve a json object"):
-                    app.note("Do some thinking")
+                    app.to_self("Calls itself")
                     app.note("Do lots and lots and lots of thinking")
                     app.ret("Value from db")
                 web.ret("HTML response")
