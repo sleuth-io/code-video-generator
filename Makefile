@@ -1,4 +1,4 @@
-.PHONY: help pyenv run format clean check-format lint docs
+.PHONY: help pyenv run format clean check-format lint docs build
 
 # Help system from https://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
 .DEFAULT_GOAL := help
@@ -36,3 +36,6 @@ format: ## Format Python code
 	black examples --target-version py38
 	reorder-python-imports --py38-plus `find examples -name "*.py"` || black examples --target-version py38
 	reorder-python-imports --py38-plus `find code_video -name "*.py"` || black code_video --target-version py38
+
+build: ## Build docker image
+	docker build -t codevidgen-dev --build-arg VERSION=`python setup.py --version` .
