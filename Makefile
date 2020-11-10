@@ -38,4 +38,4 @@ format: ## Format Python code
 	reorder-python-imports --py38-plus `find code_video -name "*.py"` || black code_video --target-version py38
 
 build: ## Build docker image
-	docker build -t codevidgen-dev --build-arg VERSION=`python setup.py --version` .
+	docker build -t codevidgen-dev --build-arg VERSION=`python setup.py --version` -f docker/Dockerfile .
