@@ -6,6 +6,6 @@ jobs:
   run-sleuth-pr:
     runs-on: ubuntu-latest
     steps:
-    - uses: docker://mrdonbrown/code-vide-generator:latest
+    - uses: docker://mrdonbrown/sleuth-pr-dev:latest
       env:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
