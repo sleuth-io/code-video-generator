@@ -9,5 +9,5 @@ docker tag code-video-generator:$VERSION mrdonbrown/code-video-generator:$VERSIO
 docker tag code-video-generator:$VERSION mrdonbrown/code-video-generator:latest
 
 echo "Pushing $VERSION"
-docker push mrdonbrown/code-vide-generator:$VERSION
-docker push mrdonbrown/code-vide-generator:latest
+docker push mrdonbrown/code-video-generator:$VERSION
+docker push mrdonbrown/code-video-generator:latest
