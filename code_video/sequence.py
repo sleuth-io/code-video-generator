@@ -6,13 +6,11 @@ from typing import List
 from typing import Optional
 
 from manim import Arrow
-from manim import BLACK
-from manim import BLUE
 from manim import DashedLine
 from manim import DEFAULT_STROKE_WIDTH
 from manim import DOWN
+from manim import ITALIC
 from manim import LEFT
-from manim import Rectangle
 from manim import RIGHT
 from manim import Scene
 from manim import ShowCreation
@@ -24,45 +22,31 @@ from manim.mobject.geometry import DEFAULT_DASH_LENGTH
 from manim.mobject.geometry import Polygon
 from numba import np
 
+from code_video.library import Library
+
+ARROW_STROKE_WIDTH = DEFAULT_STROKE_WIDTH * 1.2
+
 
 class Actor(VGroup):
-    CONFIG = {
-        "text_font": "Helvetica",
-        "actor_fill_color": BLUE,
-        "actor_text_color": BLACK,
-    }
-
     def __init__(self, diagram: SequenceDiagram, title: str):
         super().__init__()
         self.diagram = diagram
 
         self.title = title
 
-        tblock = VGroup()
-        title = Text(title, font=self.CONFIG["text_font"], color=self.CONFIG["actor_text_color"])
-        rect = (
-            Rectangle(height=self._get_text_height(title) + 0.5, width=title.get_width() + 0.5)
-            .round_corners(0.2)
-            .set_fill(self.CONFIG["actor_fill_color"], 1)
-        )
-        title.move_to(rect)
-        tblock.add(rect, title)
-        self.block = tblock
+        self.block = self.diagram.lib.text_box(title, shadow=True, rounded=True)
 
         self.line = DashedLine(
-            start=rect.get_edge_center(DOWN),
-            end=[rect.get_center()[0], rect.get_bottom()[1], 0],
+            start=self.block.get_edge_center(DOWN),
+            end=[self.block.get_center()[0], self.block.get_bottom()[1], 0],
             stroke_style="dashed",
             dash_length=DEFAULT_DASH_LENGTH * 4,
             stroke_width=DEFAULT_STROKE_WIDTH / 2,
             positive_space_ratio=0.7,
         )
-        self.bblock = tblock.copy()
+        self.bblock = self.block.copy()
         self.bblock.next_to(self.line, direction=DOWN, buff=0)
-        self.add(tblock, self.line, self.bblock)
-
-    def _get_text_height(self, text: Text) -> float:
-        return max(Text("Ay", font=self.CONFIG["text_font"]).get_height(), text.get_height())
+        self.add(self.block, self.line, self.bblock)
 
     def stretch(self, middle_height: float):
         self.remove(self.line, self.bblock)
@@ -134,10 +118,15 @@ class Interaction(VGroup):
     def finish(self, target: Actor):
         self.target = target
 
-        line = Arrow(start=[self.source.get_center()[0], 0, 0], end=[self.target.get_center()[0], 0, 0], buff=0)
-        self.add(line)
-        text = Text(self.label, font=self.source.CONFIG["text_font"]).scale(0.7).next_to(line, direction=UP, buff=0)
-        self.add(text)
+        line = Arrow(
+            start=[self.source.get_center()[0], 0, 0],
+            end=[self.target.get_center()[0], 0, 0],
+            buff=0,
+            stroke_width=ARROW_STROKE_WIDTH,
+        )
+        text = Text(self.label, font=self.source.diagram.lib.text_font, size=0.7, slant=ITALIC)
+        text.next_to(line, direction=UP, buff=0)
+        self.add(line, text)
         return self
 
     def scale(self, scale_factor, **kwargs):
@@ -154,21 +143,12 @@ class Note(Interaction):
     def __init__(self, target: Actor, label: str, direction: np.array):
         super().__init__(target)
         self.target = target
-        self.label = "\n".join(wrap(label, 30))
+        self.label = label
         self.direction = direction
 
-        block = VGroup()
-        title = Text(self.label, font="Helvetica").scale(0.7)
-
-        ear_size = title.get_width() * 0.08
-        w = title.get_width() + 0.3 * 2
-        h = title.get_height() + 0.3
-        border = Polygon(
-            (0, h, 0), (w - ear_size, h, 0), (w, h - ear_size, 0), (w, 0, 0), (0, 0, 0), (0, h, 0), color=WHITE
+        block = target.diagram.lib.note_box(
+            self.label, text_attrs={"size": 0.7}, color=WHITE, border_color=WHITE, bg_color="#FFFFFF00", shadow=False
         )
-
-        title.move_to(border)
-        block.add(border, title)
         block.next_to(target.get_center(), direction)
         self.add(block)
 
@@ -202,15 +182,17 @@ class SelfArrow(Interaction):
             [target.get_center()[0], spacing, 0],
             color=WHITE,
         )
+        line.set_stroke(width=ARROW_STROKE_WIDTH)
 
         arrow = Arrow(
             start=[target.get_center()[0] + distance, -1 * spacing, 0],
             end=[target.get_center()[0], -1 * spacing, 0],
             buff=0,
+            stroke_width=ARROW_STROKE_WIDTH,
         )
         line_block.add(line, arrow)
 
-        title = Text(self.label, font="Helvetica").scale(0.7)
+        title = Text(self.label, font="Helvetica", size=0.7, slant=ITALIC)
         title.next_to(line_block)
 
         block = VGroup()
@@ -233,6 +215,7 @@ class SequenceDiagram(VGroup):
         super().__init__(**kwargs)
         self.actors: Dict[str, Actor] = {}
         self.interactions: List[Interaction] = []
+        self.lib = Library()
 
     def add_objects(self, *object_names: str):
         for name in object_names:
