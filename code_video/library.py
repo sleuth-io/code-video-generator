@@ -13,7 +13,7 @@ from manim import VGroup
 
 SHADOW_COLOR = BLACK
 
-SHADOW_OPACITY = 0.7
+SHADOW_OPACITY = 0.3
 
 SHADOW_SHIFT = 0.07
 
