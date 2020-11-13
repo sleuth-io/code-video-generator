@@ -1,5 +1,3 @@
-from importlib.metadata import PackageNotFoundError
-from importlib.metadata import version
 from os.path import dirname
 
 from manim import DOWN
@@ -17,6 +15,8 @@ from code_video import CodeScene
 from code_video import SequenceDiagram
 from code_video.library import Library
 
+from importlib.metadata import version, PackageNotFoundError
+
 try:
     __version__ = version(__name__)
 except PackageNotFoundError:
@@ -33,7 +33,8 @@ def title_scene(scene):
     scene.play(ShowCreation(title))
     scene.play(
         FadeIn(
-            PangoText(f"Code walkthrough of version {__version__}", font="Helvetica")
+            PangoText(f"Code and examples from version {__version__}",
+                      font="Helvetica")
             .scale(0.6)
             .next_to(title, direction=DOWN, buff=LARGE_BUFF)
         )
