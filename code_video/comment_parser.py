@@ -42,7 +42,7 @@ def parse(
         stripped = line.strip()
         if stripped.startswith(f"{comment_marker} end"):
             last_comment = comments[-1]
-            last_comment.end = len(code)
+            last_comment.end = len(code) + start_line - 1
             if not keep_comments:
                 continue
         elif stripped.startswith(comment_marker):
@@ -50,7 +50,7 @@ def parse(
             if not keep_comments:
                 continue
         elif comment:
-            comment.start = len(code) + 1
+            comment.start = len(code) + start_line
             comment.end = comment.start
             comments.append(comment)
             comment = Comment()

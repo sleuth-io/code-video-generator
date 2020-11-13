@@ -116,6 +116,10 @@ class CodeScene(MovingCameraScene):
         if end == -1:
             end = len(tex.line_numbers) + 1
 
+        if hasattr(tex, "line_no_from"):
+            start -= tex.line_no_from - 1
+            end -= tex.line_no_from - 1
+
         def in_range(number: int):
             return start <= number <= end
 
@@ -177,7 +181,8 @@ class CodeScene(MovingCameraScene):
         return self.highlight_lines(tex, number, number, caption=caption)
 
     def highlight_none(self, tex: Code):
-        return self.highlight_lines(tex, 1, len(tex.code) + 1, caption=None)
+        start_line = tex.line_no_from
+        return self.highlight_lines(tex, start_line, len(tex.code) + start_line, caption=None)
 
     def create_code(self, path: str, **kwargs) -> Code:
         tex = Code(path, font=self.CONFIG["code_font"], style=self.CONFIG["code_theme"], **kwargs)

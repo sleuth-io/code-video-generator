@@ -1,3 +1,5 @@
+from importlib.metadata import PackageNotFoundError
+from importlib.metadata import version
 from os.path import dirname
 
 from manim import DOWN
@@ -15,16 +17,23 @@ from code_video import CodeScene
 from code_video import SequenceDiagram
 from code_video.library import Library
 
+try:
+    __version__ = version(__name__)
+except PackageNotFoundError:
+    # package is not installed
+    __version__ = "0.3-dev"
+
 example_dir = dirname(__file__)
 
 
 def title_scene(scene):
+
     scene.add_background(f"{example_dir}/resources/blackboard.jpg")
     title = PangoText("How to use Code Video Generator", font="Helvetica")
     scene.play(ShowCreation(title))
     scene.play(
         FadeIn(
-            PangoText("A code walkthrough", font="Helvetica")
+            PangoText(f"Code walkthrough of version {__version__}", font="Helvetica")
             .scale(0.6)
             .next_to(title, direction=DOWN, buff=LARGE_BUFF)
         )
@@ -116,7 +125,7 @@ def demo_sequence(scene: CodeScene):
         """
         You can use Code Video Generator to also illustrate
         high-level concepts through sequence diagrams, or
-        if you want more control, your own block diagrams.
+        if you want more control, your own block diagrams:
         """,
         font="Helvetica",
         line_spacing=0.5,

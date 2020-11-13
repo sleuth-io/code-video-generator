@@ -9,6 +9,7 @@ help:
 pyenv: ## Install and setup local py env
 	python3.8 -m venv venv
 	venv/bin/pip install -r requirements.txt
+	cd venv/lib/python3.8/site-packages && git apply ../../../../patches/639.diff && cd -
 
 clean: pyenv ## Clean the project and set everything up
 
