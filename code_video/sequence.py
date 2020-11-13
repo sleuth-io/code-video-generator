@@ -56,7 +56,7 @@ class Actor(VGroup):
             stroke_style="dashed",
             dash_length=DEFAULT_DASH_LENGTH * 2,
             stroke_width=DEFAULT_STROKE_WIDTH / 2,
-            positive_space_ratio=.5,
+            positive_space_ratio=0.5,
         )
         self.bblock = self.block.copy()
         self.bblock.next_to(self.line, direction=DOWN, buff=0)

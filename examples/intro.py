@@ -8,9 +8,12 @@ from manim import LEFT
 from manim import linear
 from manim import MED_LARGE_BUFF
 from manim import PangoText
+from manim import RIGHT
 from manim import ShowCreation
 
 from code_video import CodeScene
+from code_video import SequenceDiagram
+from code_video.library import Library
 
 example_dir = dirname(__file__)
 
@@ -35,8 +38,8 @@ def overview(scene):
     title = PangoText(
         """
     Manim is a Python library used to generate videos,
-    and Code Video Generator provides a base scene that makes it easy
-    to generate code walkthrough videos
+    and Code Video Generator extends it to make it easy
+    to generate code-related videos
     ... in fact, it is what was used to generate this video!
     """,
         font="Helvetica",
@@ -97,8 +100,8 @@ def demo_render_self(scene: CodeScene):
         title="examples/intro.py",
         path=f"{example_dir}/intro.py",
         keep_comments=True,
-        start_line=92,
-        end_line=108,
+        start_line=93,
+        end_line=109,
         reset_at_end=False,
     )
     # end
@@ -108,38 +111,60 @@ def demo_render_self(scene: CodeScene):
     scene.clear()
 
 
-def demo_highlighting(scene: CodeScene):
+def demo_sequence(scene: CodeScene):
     title = PangoText(
         """
-        If you want more control, you can create code blocks and
-        highlight them manually.
+        You can use Code Video Generator to also illustrate
+        high-level concepts through sequence diagrams, or
+        if you want more control, your own block diagrams.
         """,
         font="Helvetica",
         line_spacing=0.5,
     ).scale(0.7)
-    scene.play(ShowCreation(title, run_time=3, rate_func=linear))
-    scene.wait(2)
+    scene.play(ShowCreation(title, run_time=4, rate_func=linear))
+    scene.wait(3)
     scene.clear()
 
     scene.add_background(f"{example_dir}/resources/blackboard.jpg")
-    tex = scene.create_code(f"{example_dir}/highlights.py")
-    scene.play(ShowCreation(tex))
-    scene.highlight_line(
-        tex,
-        11,
-        caption="Create code blocks yourself and pass in any arguments the Code class supports to do things "
-        "like change the theme or font",
-    )
-    scene.highlight_lines(
-        tex,
-        13,
-        19,
-        caption="Highlight code with a caption to give extra information. A wait is"
-        " automatically added for a time based on the length of the caption",
-    )
-    scene.highlight_line(tex, 21, caption="Reset highlighting and positioning")
-    scene.highlight_none(tex)
-    scene.play(FadeOut(tex))
+    diagram = SequenceDiagram()
+    browser, web, app = diagram.add_objects("Browser", "Web", "App")
+    with browser:
+        with web.text("Make a request"):
+            web.to_target("Do a quick thing", app)
+            with app.text("Retrieve a json object"):
+                app.to_self("Calls itself")
+                app.note("Do lots and lots and lots of thinking")
+                app.ret("Value from db")
+            web.ret("HTML response")
+
+    diagram.animate(scene)
+    scene.wait(3)
+    scene.play(FadeOut(diagram))
+    scene.clear()
+
+
+def demo_boxes(scene: CodeScene):
+    scene.add_background(f"{example_dir}/resources/blackboard.jpg")
+    lib = Library()
+
+    comp1 = lib.text_box("Component A", shadow=False)
+    comp2 = lib.text_box("Component B", shadow=False)
+    comp3 = lib.text_box("Component C", shadow=False)
+    comp1.to_edge(LEFT)
+    comp2.next_to(comp1, DOWN, buff=1)
+    comp3.next_to(comp1, RIGHT, buff=4)
+    arrow1 = lib.connect(comp2, comp1, "Do something")
+    arrow2 = lib.connect(comp1, comp3, "Do another thing")
+
+    scene.play(FadeIn(comp2))
+    scene.wait_until_beat(1)
+    scene.play(ShowCreation(arrow1))
+    scene.play(FadeIn(comp1))
+    scene.wait_until_beat(1)
+    scene.play(ShowCreation(arrow2))
+    scene.play(FadeIn(comp3))
+
+    scene.wait_until_beat(4)
     scene.clear()
 
 
@@ -165,6 +190,7 @@ class Main(CodeScene):
         title_scene(self)
         overview(self)
         demo_commenting(self)
-        demo_highlighting(self)
-        demo_render_self(self)
+        demo_sequence(self)
+        demo_boxes(self)
+        # demo_render_self(self)
         goodbye(self)
