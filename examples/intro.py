@@ -1,3 +1,5 @@
+from importlib.metadata import PackageNotFoundError
+from importlib.metadata import version
 from os.path import dirname
 
 from manim import DOWN
@@ -10,12 +12,12 @@ from manim import MED_LARGE_BUFF
 from manim import PangoText
 from manim import RIGHT
 from manim import ShowCreation
+from manim import Text
+from manim import UP
 
 from code_video import CodeScene
 from code_video import SequenceDiagram
 from code_video.library import Library
-
-from importlib.metadata import version, PackageNotFoundError
 
 try:
     __version__ = version(__name__)
@@ -33,8 +35,7 @@ def title_scene(scene):
     scene.play(ShowCreation(title))
     scene.play(
         FadeIn(
-            PangoText(f"Code and examples from version {__version__}",
-                      font="Helvetica")
+            PangoText(f"Code and examples from version {__version__}", font="Helvetica")
             .scale(0.6)
             .next_to(title, direction=DOWN, buff=LARGE_BUFF)
         )
@@ -136,11 +137,16 @@ def demo_sequence(scene: CodeScene):
     scene.clear()
 
     scene.add_background(f"{example_dir}/resources/blackboard.jpg")
-    diagram = SequenceDiagram()
+
+    title = Text("examples/boxes.py")
+    title.to_edge(UP)
+    scene.add(title)
+
+    diagram = SequenceDiagram(max_y=title.get_y(DOWN) - 1)
     browser, web, app = diagram.add_objects("Browser", "Web", "App")
     with browser:
         with web.text("Make a request"):
-            web.to_target("Do a quick thing", app)
+            web.to_target("Request with no response", app)
             with app.text("Retrieve a json object"):
                 app.to_self("Calls itself")
                 app.note("Do lots and lots and lots of thinking")
@@ -157,9 +163,13 @@ def demo_boxes(scene: CodeScene):
     scene.add_background(f"{example_dir}/resources/blackboard.jpg")
     lib = Library()
 
+    title = Text("examples/boxes.py")
+    title.to_edge(UP)
+    scene.add(title)
     comp1 = lib.text_box("Component A", shadow=False)
     comp2 = lib.text_box("Component B", shadow=False)
     comp3 = lib.text_box("Component C", shadow=False)
+    comp1.next_to(title, DOWN, buff=2)
     comp1.to_edge(LEFT)
     comp2.next_to(comp1, DOWN, buff=1)
     comp3.next_to(comp1, RIGHT, buff=4)

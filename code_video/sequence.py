@@ -28,7 +28,7 @@ ARROW_STROKE_WIDTH = DEFAULT_STROKE_WIDTH * 1.2
 
 
 class Actor(VGroup):
-    def __init__(self, diagram: SequenceDiagram, title: str):
+    def __init__(self, diagram: SequenceDiagram, title: str, max_y: float):
         super().__init__()
         self.diagram = diagram
 
@@ -211,20 +211,22 @@ class SelfArrow(Interaction):
 
 
 class SequenceDiagram(VGroup):
-    def __init__(self, **kwargs):
+    def __init__(self, max_y: Optional[float] = None, **kwargs):
         super().__init__(**kwargs)
         self.actors: Dict[str, Actor] = {}
         self.interactions: List[Interaction] = []
         self.lib = Library()
+        self.max_y = self.CONFIG["frame_radius_y"] if not max_y else max_y
 
     def add_objects(self, *object_names: str):
         for name in object_names:
-            actor = Actor(self, name)
+            actor = Actor(self, name, max_y=self.max_y)
             if not self.actors:
                 actor.to_edge(LEFT)
             else:
                 actor.next_to(list(self.actors.values())[-1])
-            actor.to_edge(UP)
+            # actor.to_edge(UP)
+            actor.set_y(self.max_y, UP)
             self.actors[name] = actor
             self.add(actor)
 
@@ -252,8 +254,9 @@ class SequenceDiagram(VGroup):
         for actor in self.actors.values():
             actor.stretch(sum(item.get_height() + 0.5 for item in self.interactions))
 
-        if scene.renderer.camera.frame_height < self.get_height() + 1.5:
-            height_scale = scene.renderer.camera.frame_height / (self.get_height() + 1.5)
+        max_height = scene.renderer.camera.frame_height - (scene.renderer.camera.frame_height / 2 - self.max_y)
+        if max_height < self.get_height() + 1.5:
+            height_scale = max_height / (self.get_height() + 1.5)
         else:
             height_scale = 1
 
@@ -265,9 +268,10 @@ class SequenceDiagram(VGroup):
         scale = min(1, height_scale, width_scale)
 
         self.scale(scale)
-        self.to_edge(UP)
+        # self.to_edge(UP)
+        self.set_y(self.max_y, UP)
         self.to_edge(LEFT)
-        start_y = self.get_edge_center(UP)[1] - 1.5 * scale
+        start_y = self.max_y - 1.5 * scale
 
         scene.play(ShowCreation(self))
 
