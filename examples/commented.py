@@ -11,9 +11,9 @@ class CommentedScene(CodeScene):
         # Add a full screen background image to make the video a bit more interesting
         self.add_background(f"{example_dir}/resources/blackboard.jpg")
 
-        # Display the code and animate comments as highlighted lines. For more control, use
-        # highlight_line(s) directly.
-        self.animate_code_comments(f"{example_dir}/commented.py", keep_comments=True, start_line=6, end_line=17)
+        # Display the code and animate comments as highlighted lines. For more control,
+        # use highlight_line(s) directly.
+        self.animate_code_comments(f"{example_dir}/commented.py", keep_comments=True, start_line=6, end_line=18)
         # end
 
         self.wait(5)

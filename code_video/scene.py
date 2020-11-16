@@ -1,14 +1,18 @@
 import os
-from tempfile import NamedTemporaryFile
-from textwrap import wrap
 from typing import Optional
 from typing import Union
 
 from manim import *
 
 from code_video import comment_parser
+from code_video.autoscale import AutoScaled
+from code_video.code_walkthrough import HighlightLines
+from code_video.code_walkthrough import HighlightNone
+from code_video.code_walkthrough import PartialCode
+from code_video.layout import ColumnLayout
 from code_video.music import BackgroundMusic
 from code_video.music import fit_audio
+from code_video.widgets import TextBox
 
 
 class CodeScene(MovingCameraScene):
@@ -84,109 +88,80 @@ class CodeScene(MovingCameraScene):
         reset_at_end: bool = True,
     ) -> Code:
 
-        parent = None
-        if title:
-            title = PangoText(title, font=self.CONFIG["text_font"]).to_edge(edge=UP)
-            self.add(title)
-            code_group = VGroup().next_to(title, direction=DOWN)
-            self.add(code_group)
-            parent = code_group
-
         code, comments = comment_parser.parse(
             path, keep_comments=keep_comments, start_line=start_line, end_line=end_line
         )
 
-        with NamedTemporaryFile(suffix=f".{path.split('.')[-1]}") as f:
-            f.writelines([line.encode() for line in code])
-            f.flush()
-            tex = self.create_code(f.name, line_no_from=start_line)
-            if parent:
-                parent.add(tex)
+        tex = AutoScaled(PartialCode(code=code, line_no_from=start_line))
+        if title is None:
+            title = path
+
+        title = Text(title, color=WHITE).to_edge(edge=UP)
+        self.add(title)
+        tex.next_to(title, DOWN)
+
         self.play(ShowCreation(tex))
         self.wait()
 
         for comment in comments:
             self.highlight_lines(tex, comment.start, comment.end, comment.caption)
 
-        if reset_at_end:
-            self.highlight_none(tex)
-        return tex
-
-    def highlight_lines(self, tex: Code, start: int = 1, end: int = -1, caption: Optional[str] = None):
-        if end == -1:
-            end = len(tex.line_numbers) + 1
-
-        if hasattr(tex, "line_no_from"):
-            start -= tex.line_no_from - 1
-            end -= tex.line_no_from - 1
-
-        def in_range(number: int):
-            return start <= number <= end
-
-        pre_actions = []
-        actions = []
-        post_actions = []
-
-        if caption:
-            caption = "\n".join(wrap(caption, 25))
-            if self.caption:
-                pre_actions.append(FadeOut(self.caption))
-            else:
-                self.play(ApplyMethod(tex.to_edge))
-
-            self.caption = PangoText(
-                caption, font=self.CONFIG["text_font"], size=self.col_width / 10 * 0.9
-            ).add_background_rectangle(buff=MED_SMALL_BUFF)
-            self.caption.next_to(tex, RIGHT)
-            self.caption.align_to(tex.line_numbers[start - 1], UP)
-            actions.append(FadeIn(self.caption))
-
-        elif self.caption:
-            actions.append(FadeOut(self.caption))
-            post_actions += [ApplyMethod(tex.center)]
+        if self.caption:
+            self.play(FadeOut(self.caption))
             self.caption = None
 
-        # highlight code lines
-        actions += [
-            ApplyMethod(
-                tex.code[line_no].set_opacity,
-                1 if in_range(line_no + 1) else 0.3,
+        if reset_at_end:
+            self.play(HighlightNone(tex))
+            self.play(ApplyMethod(tex.full_size))
+        return tex
+
+    def highlight_lines(self, tex: AutoScaled, start: int = 1, end: int = -1, caption: Optional[str] = None):
+
+        if end == -1:
+            end = len(tex.line_numbers) + tex.line_no_from
+
+        layout = ColumnLayout(columns=3)
+
+        actions = []
+        if caption and not self.caption:
+            self.play(
+                ApplyMethod(
+                    tex.fill_between_x,
+                    layout.get_x(1, span=2, direction=LEFT),
+                    layout.get_x(1, span=2, direction=RIGHT),
+                )
             )
-            for line_no in range(len(tex.code))
-        ]
 
-        # highlight line numbers
-        actions += [
-            ApplyMethod(
-                tex.line_numbers[line_no].set_opacity,
-                1 if in_range(line_no + 1) else 0.3,
-            )
-            for line_no in range(len(tex.code))
-        ]
+        if self.caption:
+            actions.append(FadeOut(self.caption))
+            self.caption = None
 
-        if pre_actions:
-            self.play(*pre_actions)
+        if not caption:
+            self.play(ApplyMethod(tex.full_size))
+        else:
+            callout = TextBox(caption, text_attrs=dict(size=0.5))
+            callout.align_to(tex.line_numbers[start - tex.line_no_from], UP)
+            callout.set_x(layout.get_x(3), LEFT)
+            actions += [HighlightLines(tex, start, end), FadeIn(callout)]
+            self.caption = callout
 
-        if actions:
-            self.play(*actions)
+        self.play(*actions)
 
-        if caption:
-            wait_time = len(caption) / (200 * 5 / 60)
+        if not self.caption:
+            self.play(ApplyMethod(tex.full_size))
+        else:
+            wait_time = len(self.caption.text) / (200 * 5 / 60)
             self.wait_until_measure(wait_time, -1.5)
 
-        if post_actions:
-            self.play(*post_actions)
-
-    def highlight_line(self, tex: Code, number: int = -1, caption: Optional[str] = None):
+    def highlight_line(self, tex: AutoScaled, number: int = -1, caption: Optional[str] = None):
         return self.highlight_lines(tex, number, number, caption=caption)
 
-    def highlight_none(self, tex: Code):
-        start_line = tex.line_no_from
-        return self.highlight_lines(tex, start_line, len(tex.code) + start_line, caption=None)
+    def highlight_none(self, tex: AutoScaled):
+        if self.caption:
+            self.play(FadeOut(self.caption), HighlightNone(tex))
+            self.caption = None
+
+        self.play(ApplyMethod(tex.full_size))
 
     def create_code(self, path: str, **kwargs) -> Code:
-        tex = Code(path, font=self.CONFIG["code_font"], style=self.CONFIG["code_theme"], **kwargs)
-        x_scale = (self.col_width * 2) / tex.get_width()
-        y_scale = self.camera_frame.get_height() * 0.95 / tex.get_height()
-        tex.scale(min(x_scale, y_scale))
-        return tex
+        return AutoScaled(Code(path, font=self.CONFIG["code_font"], style=self.CONFIG["code_theme"], **kwargs))

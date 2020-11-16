@@ -95,7 +95,7 @@ def demo_commenting(scene: CodeScene):
     scene.highlight_lines(
         code,
         start=14,
-        end=17,
+        end=18,
         caption="You can also highlight multiple " "lines by ending the block with '# " "end'",
     )
     scene.highlight_none(code)
@@ -206,11 +206,11 @@ def goodbye(scene: CodeScene):
 
 class Main(CodeScene):
     def construct(self):
-        self.add_background_music(f"{example_dir}/resources/Pure Magic - Chris Haugen.mp3")
-        title_scene(self)
-        overview(self)
+        # self.add_background_music(f"{example_dir}/resources/Pure Magic - Chris Haugen.mp3")
+        # title_scene(self)
+        # overview(self)
         demo_commenting(self)
-        demo_sequence(self)
-        demo_boxes(self)
-        # demo_render_self(self)
-        goodbye(self)
+        # demo_sequence(self)
+        # demo_boxes(self)
+        # # demo_render_self(self)
+        # goodbye(self)
