@@ -6,9 +6,9 @@ python:
       extra_requirements:
         - doc
     - method: pip
-        path: docs/reinstall-cario-step-1.txt
+        path: "docs/reinstall-cario-step-1.txt"
     - method: pip
-        path: docs/reinstall-cario-step-2.txt
+        path: "docs/reinstall-cario-step-2.txt"
   system_packages: false
 
 mkdocs:
