@@ -121,6 +121,8 @@ class AutoScaled(ObjectProxy):
         return self
 
     def _autoscale(self, direction: np.array):
+        if not self.__wrapped__.get_width() or not self.__wrapped__.get_height():
+            return
         x_scale = self._bounds.width / self.__wrapped__.get_width()
         y_scale = self._bounds.height / self.__wrapped__.get_height()
         self.scale(min(x_scale, y_scale), about_point=self._bounds.as_mobject().get_critical_point(direction))

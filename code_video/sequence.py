@@ -5,7 +5,7 @@ from typing import Dict
 from typing import List
 from typing import Optional
 
-from manim import Arrow
+from manim import Arrow, config
 from manim import DashedLine
 from manim import DEFAULT_STROKE_WIDTH
 from manim import DOWN
@@ -216,7 +216,7 @@ class SequenceDiagram(VGroup):
         self.actors: Dict[str, Actor] = {}
         self.interactions: List[Interaction] = []
         self.lib = Library()
-        self.max_y = self.CONFIG["frame_radius_y"] if not max_y else max_y
+        self.max_y = config["frame_y_radius"] if not max_y else max_y
 
     def add_objects(self, *object_names: str):
         for name in object_names:
@@ -247,6 +247,10 @@ class SequenceDiagram(VGroup):
                 last.finish(actor)
         interaction = Interaction(actor)
         self.interactions.append(interaction)
+
+        for actor in self.actors.values():
+            actor.stretch(sum(item.get_height() + 0.5 for item in self.interactions))
+
         return interaction
 
     def animate(self, scene: Scene):
@@ -284,4 +288,15 @@ class SequenceDiagram(VGroup):
                 interaction.set_y(last.get_y(DOWN) - 0.5 * scale, direction=UP)
 
             scene.play(ShowCreation(interaction))
+            last = interaction
+
+    def get_interactions(self, scale: float):
+        last: Interaction = None
+        for interaction in [item for item in self.interactions if item.target]:
+            interaction.scale(scale)
+            if not last:
+                interaction.set_y(list(self.actors.values())[0].block.get_y(DOWN), direction=UP)
+            else:
+                interaction.set_y(last.get_y(DOWN) - 0.5 * scale, direction=UP)
+            yield interaction
             last = interaction
