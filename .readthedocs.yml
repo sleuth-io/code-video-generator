@@ -5,10 +5,8 @@ python:
       path: .
       extra_requirements:
         - doc
-    - method: pip
-        path: "docs/reinstall-cario-step-1.txt"
-    - method: pip
-        path: "docs/reinstall-cario-step-2.txt"
+    - requirements: docs/reinstall-cario-step-1.txt
+    - requirements: docs/reinstall-cario-step-2.txt
   system_packages: false
 
 mkdocs:
