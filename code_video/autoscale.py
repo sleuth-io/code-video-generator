@@ -1,6 +1,6 @@
+from dataclasses import dataclass
 from typing import Tuple
 
-from attr import dataclass
 from manim import config
 from manim import DEFAULT_MOBJECT_TO_EDGE_BUFFER
 from manim import DEFAULT_MOBJECT_TO_MOBJECT_BUFFER

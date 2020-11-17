@@ -8,5 +8,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Build image
-      run: make build
+    - name: Build image and examples
+      run: make build-examples
