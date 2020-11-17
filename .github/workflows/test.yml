@@ -35,7 +35,7 @@ jobs:
         make check-format
     - name: Build examples
       run: |
-        make build-examples
+        make examples
 # No tests yet :(
 #    - name: Test with pytest
 #      run: |
