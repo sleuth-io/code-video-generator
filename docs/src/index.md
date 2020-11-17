@@ -1,6 +1,6 @@
 # Code Video Generator
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/Jn7ZJ-OAM1g" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/1V5TQRuQ8A4" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 Code Video Generator is a library for [Manim](https://github.com/manimcommunity/manim) that makes creating decent
  looking code-related animation videos easy.  With a few comments in your target source files and a bit of Python, you
