@@ -6,7 +6,7 @@ Code Video Generator is a library for [Manim](https://github.com/manimcommunity/
  looking code-related animation videos easy.  With a few comments in your target source files and a bit of Python, you
   can
   generate a code walk through video with animations, code formatting, automatic callouts, and even synchronized
-   sound. Beyond just code, you can also animate diagrams such as sequence diagrams.
+   sound. Beyond just code, you can also animate diagrams such as sequence or architecture diagrams.
 
 ## Features
 
@@ -46,7 +46,7 @@ It should look something like this:
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/I-Y__IJ_y90" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
-For other ways to install, see the [Install](installation.html) page.
+For other ways to install, see the [Install](installation.md) page.
 
 ## Get involved
 

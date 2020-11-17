@@ -1,5 +1,10 @@
 [![Introduction video](http://img.youtube.com/vi/Jn7ZJ-OAM1g/0.jpg)](http://www.youtube.com/watch?v=Jn7ZJ-OAM1g "Introduction")
 
+![GitHub Actions](https://github.com/sleuth-io/code-video-generator/workflows/Test/badge.svg)
+[![PyPI](https://img.shields.io/pypi/dm/code-video-generator.svg)](https://pypi.python.org/pypi/code-video-generator)
+[![PyPI](https://img.shields.io/pypi/v/code-video-generator.svg)](https://pypi.python.org/pypi/code-video-generator)
+
+
 Code Video Generator is a library that uses the [Manim](https://github.com/manimcommunity/manim) animation engine
  to automatically generate code walkthrough videos. In fact, the source for the video above is at [examples/intro.py](https://github.com/sleuth-io/code-video-generator/tree/master/examples/intro.py).
  

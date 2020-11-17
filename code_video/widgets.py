@@ -89,7 +89,15 @@ class BoxBase(VGroup):
 
 
 class TextBox(BoxBase):
+    """
+    A text with a box around it
+    """
+
     def __init__(self, text: str, **kwargs):
+        """
+        Args:
+            text: The text to display
+        """
         super().__init__(text, **kwargs)
         self._box(
             text=text,
@@ -100,7 +108,15 @@ class TextBox(BoxBase):
 
 
 class NoteBox(BoxBase):
+    """
+    Text with a note box around it
+    """
+
     def __init__(self, text: str, **kwargs):
+        """
+        Args:
+            text: The text to display
+        """
         super().__init__(text, **kwargs)
 
         def build_border(title: Text):
@@ -113,10 +129,19 @@ class NoteBox(BoxBase):
 
 
 class Connection(VGroup):
+    """
+    An arrow connection between two objects
+    """
 
     CONFIG = {"font": ""}
 
     def __init__(self, source: Mobject, target: Mobject, label: Optional[str] = None, **kwargs):
+        """
+        Args:
+            source: The source object
+            target: The target object
+            label: The optional label text to put over the arrow
+        """
         super().__init__(**kwargs)
         label_direction = UP
         label_buff = 0

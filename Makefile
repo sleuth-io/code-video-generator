@@ -1,4 +1,4 @@
-.PHONY: help pyenv run format clean check-format lint docs build
+.PHONY: help pyenv run format clean check-format lint docs build examples
 
 # Help system from https://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
 .DEFAULT_GOAL := help
@@ -40,3 +40,7 @@ format: ## Format Python code
 
 build: ## Build docker image
 	docker build -t codevidgen-dev --build-arg VERSION=`python setup.py --version` -f docker/Dockerfile .
+
+EXAMPLES_DIR = ./examples
+examples: ## Builds all examples
+	$(foreach file, $(wildcard $(EXAMPLES_DIR)/*.py), manim -ql $(file);)

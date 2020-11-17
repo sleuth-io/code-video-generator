@@ -38,13 +38,27 @@ class Bounds:
 
 
 class AutoScaled(ObjectProxy):
-    def __init__(self, delegate: Mobject, rescale=True):
+    """
+    Autoscales whatever it wraps on changes in placement including:
+    * `next_to`
+    * `to_edge`
+    * `set_x`
+    * `set_y`
+    * `move_to`
+    """
+
+    def __init__(self, delegate: Mobject, rescale: bool = True):
+        """
+        Args:
+            delegate: The object to scale
+            rescale: Whether to rescale the object immediately or not
+        """
         super().__init__(delegate)
         self._overall_scale_factor: float = 1
         self._bounds = Bounds()
         self.reset_bounds()
         if rescale:
-            self._autoscale(ORIGIN)
+            self.autoscale(ORIGIN)
 
     def scale(self, scale_factor, **kwargs):
         self._overall_scale_factor *= scale_factor
@@ -61,44 +75,50 @@ class AutoScaled(ObjectProxy):
     def next_to(self, mobject_or_point, direction=RIGHT, **kwargs):
         self.__wrapped__.next_to(mobject_or_point, direction, **kwargs)
         self._update_bounds_to_direction(direction * -1)
-        self._autoscale(direction * -1)
+        self.autoscale(direction * -1)
 
         return self
 
     def move_to(self, point_or_mobject, aligned_edge=ORIGIN, coor_mask=np.array([1, 1, 1])):
         self.__wrapped__.move_to(point_or_mobject, aligned_edge, coor_mask)
         self._update_bounds_to_direction(aligned_edge)
-        self._autoscale(aligned_edge)
+        self.autoscale(aligned_edge)
 
         return self
 
     def set_x(self, x, direction=ORIGIN):
         self.__wrapped__.set_x(x, direction)
         self._update_bounds_to_direction(direction)
-        self._autoscale(direction)
+        self.autoscale(direction)
 
         return self
 
-    def fill_between_x(self, x_left, x_right):
+    def fill_between_x(self, x_left: float, x_right: float):
+        """
+        Autoscales between two X values
+        """
         self._bounds.ur = np.array((x_right, self._bounds.ur[1], self._bounds.ur[2]))
         self._bounds.dr = np.array((x_right, self._bounds.dr[1], self._bounds.dr[2]))
         self.set_x(x_left, LEFT)
         self._update_bounds_to_direction(LEFT)
-        self._autoscale(LEFT)
+        self.autoscale(LEFT)
 
         return self
 
     def set_y(self, y, direction=ORIGIN):
         self.__wrapped__.set_y(y)
         self._update_bounds_to_direction(direction)
-        self._autoscale(direction)
+        self.autoscale(direction)
 
         return self
 
     def full_size(self):
+        """
+        Resets the scaling to full screen
+        """
         self.reset_bounds()
         self.__wrapped__.center()
-        self._autoscale(ORIGIN)
+        self.autoscale(ORIGIN)
         return self
 
     def reset_bounds(self):
@@ -116,11 +136,17 @@ class AutoScaled(ObjectProxy):
         self.__wrapped__.to_edge(edge, buff)
 
         self._update_bounds_to_direction(edge)
-        self._autoscale(edge)
+        self.autoscale(edge)
 
         return self
 
-    def _autoscale(self, direction: np.array):
+    def autoscale(self, direction: np.array):
+        """
+        Manually autoscales in a given direction
+
+        Args:
+            direction: The direction to scale in
+        """
         if not self.__wrapped__.get_width() or not self.__wrapped__.get_height():
             return
         x_scale = self._bounds.width / self.__wrapped__.get_width()

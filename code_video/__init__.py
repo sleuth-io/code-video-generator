@@ -1,6 +1,9 @@
 from .autoscale import AutoScaled  # noqa
+from .code_walkthrough import *  # noqa
 from .layout import ColumnLayout  # noqa
 from .scene import CodeScene  # noqa
+from .sequence import Actor  # noqa
+from .sequence import Interaction  # noqa
 from .sequence import SequenceDiagram  # noqa
 from .widgets import Connection  # noqa
 from .widgets import NoteBox  # noqa

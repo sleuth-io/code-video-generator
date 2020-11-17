@@ -2,11 +2,11 @@ from __future__ import annotations
 
 from textwrap import wrap
 from typing import Dict
+from typing import Iterable
 from typing import List
 from typing import Optional
 
 from manim import Arrow
-from manim import config
 from manim import DashedLine
 from manim import DEFAULT_STROKE_WIDTH
 from manim import DOWN
@@ -30,9 +30,13 @@ ARROW_STROKE_WIDTH = DEFAULT_STROKE_WIDTH * 1.2
 
 
 class Actor(VGroup):
+    """
+    A sequence diagram actor that can be interacted with
+    """
+
     CONFIG = {"font": ""}
 
-    def __init__(self, diagram: SequenceDiagram, title: str, max_y: float):
+    def __init__(self, diagram: SequenceDiagram, title: str):
         super().__init__()
         self.diagram = diagram
 
@@ -71,6 +75,12 @@ class Actor(VGroup):
         return self
 
     def note(self, value: str):
+        """
+        Adds a note to the right of the actor
+
+        Args:
+            value: The text of the note
+        """
         note_interaction = Note(self, value, RIGHT)
         interaction = self.diagram.interactions[-1]
         if not interaction.target:
@@ -79,6 +89,12 @@ class Actor(VGroup):
             self.diagram.interactions.append(note_interaction)
 
     def to_self(self, value: str):
+        """
+        Adds an arrow to itself with a label
+
+        Args:
+            value: The label text
+        """
         note_interaction = SelfArrow(self, value)
         interaction = self.diagram.interactions[-1]
         if not interaction.target:
@@ -87,6 +103,13 @@ class Actor(VGroup):
             self.diagram.interactions.append(note_interaction)
 
     def to_target(self, value: str, target: Actor):
+        """
+        Adds an arrow to the next target
+
+        Args:
+            value: The arrow text
+            target: The target actor
+        """
         note_interaction = Interaction(source=self, label=value).finish(target)
         interaction = self.diagram.interactions[-1]
         if not interaction.target:
@@ -94,7 +117,13 @@ class Actor(VGroup):
         else:
             self.diagram.interactions.append(note_interaction)
 
-    def ret(self, value):
+    def ret(self, value: str):
+        """
+        Sets the text on the return interaction
+
+        Args:
+            value: The label text
+        """
         interaction = self.diagram.interactions[-1]
         if not interaction.target:
             interaction = self.diagram.start_interaction(self)
@@ -113,6 +142,9 @@ class Actor(VGroup):
 
 
 class Interaction(VGroup):
+    """
+    An interaction that can be displayed on the screen
+    """
 
     CONFIG = {"font": ""}
 
@@ -224,21 +256,29 @@ class SelfArrow(Interaction):
 
 
 class SequenceDiagram(VGroup):
-    def __init__(self, max_y: Optional[float] = None, **kwargs):
+    """
+    A sequence diagram built using a DSL
+    """
+
+    def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.actors: Dict[str, Actor] = {}
         self.interactions: List[Interaction] = []
-        self.max_y = config["frame_y_radius"] if not max_y else max_y
 
-    def add_objects(self, *object_names: str):
-        for name in object_names:
-            actor = Actor(self, name, max_y=self.max_y)
+    def add_objects(self, *names: str) -> List[Actor]:
+        """
+        Add objects to draw interactions between
+
+        Args:
+            names: A list of display names for the actor objects
+        """
+        for name in names:
+            actor = Actor(self, name)
             if not self.actors:
                 actor.to_edge(LEFT)
             else:
                 actor.next_to(list(self.actors.values())[-1])
-            # actor.to_edge(UP)
-            actor.set_y(self.max_y, UP)
+            actor.to_edge(UP)
             self.actors[name] = actor
             self.add(actor)
 
@@ -265,7 +305,10 @@ class SequenceDiagram(VGroup):
 
         return interaction
 
-    def get_interactions(self):
+    def get_interactions(self) -> Iterable[Interaction]:
+        """
+        Gets the pre-programmed interactions for display
+        """
         scale = getattr(self, "_overall_scale_factor", 1)
         last: Interaction = None
         for interaction in [item for item in self.interactions if item.target]:

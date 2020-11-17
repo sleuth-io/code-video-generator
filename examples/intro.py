@@ -24,7 +24,7 @@ try:
     __version__ = version(__name__)
 except PackageNotFoundError:
     # package is not installed
-    __version__ = "0.3-dev"
+    __version__ = "0.3"
 
 example_dir = dirname(__file__)
 
@@ -104,25 +104,6 @@ def demo_commenting(scene: CodeScene):
     scene.clear()
 
 
-def demo_render_self(scene: CodeScene):
-    scene.add_background(f"{example_dir}/resources/blackboard.jpg")
-
-    # Here is the code rendering this video you are watching now!
-    code = scene.animate_code_comments(
-        title="examples/intro.py",
-        path=f"{example_dir}/intro.py",
-        keep_comments=True,
-        start_line=93,
-        end_line=109,
-        reset_at_end=False,
-    )
-    # end
-    scene.wait(2)
-
-    scene.play(FadeOut(code))
-    scene.clear()
-
-
 def demo_sequence(scene: CodeScene):
     title = Text(
         """
@@ -159,7 +140,7 @@ def demo_sequence(scene: CodeScene):
     for interaction in diagram.get_interactions():
         scene.play(ShowCreation(interaction))
     scene.wait(3)
-    scene.play(FadeOut(diagram))
+    scene.play(FadeOut(diagram), *[FadeOut(item) for item in diagram.interactions])
     scene.clear()
 
 
@@ -202,6 +183,7 @@ def goodbye(scene: CodeScene):
         font="Helvetica",
         line_spacing=0.5,
     ).scale(0.7)
+    title.to_edge(LEFT)
     scene.play(ShowCreation(title, run_time=4, rate_func=linear))
     scene.wait(5)
     scene.play(FadeOut(title))
@@ -215,5 +197,4 @@ class Main(CodeScene):
         demo_commenting(self)
         demo_sequence(self)
         demo_boxes(self)
-        # # demo_render_self(self)
         goodbye(self)

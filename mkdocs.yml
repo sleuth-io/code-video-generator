@@ -1,11 +1,24 @@
 site_name: Code Video Generator
 docs_dir: docs/src
 theme:
-    name: readthedocs
-    custom_dir: docs/theme/
+  name: material
+  custom_dir: docs/theme/
 
 nav:
-    - Home: index.md
-    - Installation: installation.md
-    - GitHub: https://github.com/sleuth-io/code-video-generator
-    - About: about.md
+  - Home: index.md
+  - Installation: installation.md
+  - Examples: examples.md
+  - Changelog: changelog.md
+  - GitHub: https://github.com/sleuth-io/code-video-generator
+  - Reference: reference.md
+  - About: about.md
+
+plugins:
+  - mkdocstrings:
+      handlers:
+        python:
+          selection:
+            filters:
+              - "!^_"  # exclude all members starting with _
+              - "^__init__$"  # but always include __init__ modules and methods
+              - "!tear_down"
