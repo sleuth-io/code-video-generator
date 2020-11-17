@@ -1,6 +1,9 @@
 from tempfile import NamedTemporaryFile
 
-import librosa
+try:
+    import librosa
+except OSError as e:
+    print(f"Error importing sound: {e}")
 from pydub import AudioSegment
 
 
