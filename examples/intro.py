@@ -9,15 +9,16 @@ from manim import LARGE_BUFF
 from manim import LEFT
 from manim import linear
 from manim import MED_LARGE_BUFF
-from manim import PangoText
 from manim import RIGHT
 from manim import ShowCreation
 from manim import Text
 from manim import UP
 
+from code_video import AutoScaled
 from code_video import CodeScene
+from code_video import Connection
 from code_video import SequenceDiagram
-from code_video.library import Library
+from code_video import TextBox
 
 try:
     __version__ = version(__name__)
@@ -31,11 +32,11 @@ example_dir = dirname(__file__)
 def title_scene(scene):
 
     scene.add_background(f"{example_dir}/resources/blackboard.jpg")
-    title = PangoText("How to use Code Video Generator", font="Helvetica")
+    title = Text("How to use Code Video Generator", font="Helvetica")
     scene.play(ShowCreation(title))
     scene.play(
         FadeIn(
-            PangoText(f"Code and examples from version {__version__}", font="Helvetica")
+            Text(f"Code and examples from version {__version__}", font="Helvetica")
             .scale(0.6)
             .next_to(title, direction=DOWN, buff=LARGE_BUFF)
         )
@@ -46,7 +47,7 @@ def title_scene(scene):
 
 
 def overview(scene):
-    title = PangoText(
+    title = Text(
         """
     Manim is a Python library used to generate videos,
     and Code Video Generator extends it to make it easy
@@ -59,7 +60,7 @@ def overview(scene):
     scene.play(ShowCreation(title, run_time=10, rate_func=linear))
     scene.wait(3)
     sub = (
-        PangoText(
+        Text(
             """
         Here is an example:
         """,
@@ -123,7 +124,7 @@ def demo_render_self(scene: CodeScene):
 
 
 def demo_sequence(scene: CodeScene):
-    title = PangoText(
+    title = Text(
         """
         You can use Code Video Generator to also illustrate
         high-level concepts through sequence diagrams, or
@@ -138,11 +139,11 @@ def demo_sequence(scene: CodeScene):
 
     scene.add_background(f"{example_dir}/resources/blackboard.jpg")
 
-    title = Text("examples/boxes.py")
+    title = Text("examples/sequence-diagrams.py")
     title.to_edge(UP)
     scene.add(title)
 
-    diagram = SequenceDiagram(max_y=title.get_y(DOWN) - 1)
+    diagram = AutoScaled(SequenceDiagram())
     browser, web, app = diagram.add_objects("Browser", "Web", "App")
     with browser:
         with web.text("Make a request"):
@@ -153,7 +154,10 @@ def demo_sequence(scene: CodeScene):
                 app.ret("Value from db")
             web.ret("HTML response")
 
-    diagram.animate(scene)
+    diagram.next_to(title, DOWN)
+    scene.play(ShowCreation(diagram))
+    for interaction in diagram.get_interactions():
+        scene.play(ShowCreation(interaction))
     scene.wait(3)
     scene.play(FadeOut(diagram))
     scene.clear()
@@ -161,20 +165,19 @@ def demo_sequence(scene: CodeScene):
 
 def demo_boxes(scene: CodeScene):
     scene.add_background(f"{example_dir}/resources/blackboard.jpg")
-    lib = Library()
 
     title = Text("examples/boxes.py")
     title.to_edge(UP)
     scene.add(title)
-    comp1 = lib.text_box("Component A", shadow=False)
-    comp2 = lib.text_box("Component B", shadow=False)
-    comp3 = lib.text_box("Component C", shadow=False)
+    comp1 = TextBox("Component A", shadow=False)
+    comp2 = TextBox("Component B", shadow=False)
+    comp3 = TextBox("Component C", shadow=False)
     comp1.next_to(title, DOWN, buff=2)
     comp1.to_edge(LEFT)
     comp2.next_to(comp1, DOWN, buff=1)
     comp3.next_to(comp1, RIGHT, buff=4)
-    arrow1 = lib.connect(comp2, comp1, "Do something")
-    arrow2 = lib.connect(comp1, comp3, "Do another thing")
+    arrow1 = Connection(comp2, comp1, "Do something")
+    arrow2 = Connection(comp1, comp3, "Do another thing")
 
     scene.play(FadeIn(comp2))
     scene.wait_until_beat(1)
@@ -189,7 +192,7 @@ def demo_boxes(scene: CodeScene):
 
 
 def goodbye(scene: CodeScene):
-    title = PangoText(
+    title = Text(
         """
         Try Code Video Generator today at:
 
@@ -206,11 +209,11 @@ def goodbye(scene: CodeScene):
 
 class Main(CodeScene):
     def construct(self):
-        # self.add_background_music(f"{example_dir}/resources/Pure Magic - Chris Haugen.mp3")
-        # title_scene(self)
-        # overview(self)
+        self.add_background_music(f"{example_dir}/resources/Pure Magic - Chris Haugen.mp3")
+        title_scene(self)
+        overview(self)
         demo_commenting(self)
-        # demo_sequence(self)
-        # demo_boxes(self)
+        demo_sequence(self)
+        demo_boxes(self)
         # # demo_render_self(self)
-        # goodbye(self)
+        goodbye(self)

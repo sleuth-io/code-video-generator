@@ -1,16 +1,22 @@
 import hashlib
 from textwrap import wrap
 from typing import Callable
+from typing import Optional
 
+from manim import Arrow
 from manim import BLACK
+from manim import DOWN
 from manim import DR
+from manim import ITALIC
+from manim import LEFT
+from manim import Mobject
 from manim import Polygon
 from manim import Rectangle
+from manim import RIGHT
 from manim import Text
+from manim import UP
 from manim import VGroup
 from manim import WHITE
-
-from code_video.library import _get_text_height
 
 SHADOW_COLOR = BLACK
 
@@ -23,7 +29,7 @@ ROUNDED_RADIUS = 0.05
 VERTICAL_ARROW_LABEL_BUFF = 0.2
 
 
-class TextBox(VGroup):
+class BoxBase(VGroup):
     CONFIG = {
         "text_attrs": {},
         "wrap_at": 30,
@@ -38,12 +44,6 @@ class TextBox(VGroup):
     def __init__(self, text: str, **kwargs):
         super().__init__(**kwargs)
         self.text = text
-        self._box(
-            text=text,
-            border_builder=lambda title: Rectangle(
-                height=_get_text_height(title) + self.border_padding, width=title.get_width() + self.border_padding
-            ),
-        )
 
     def _box(
         self,
@@ -86,3 +86,66 @@ class TextBox(VGroup):
             elif len(value) == 9:
                 return value[:7], int(value[-2:], 16) / 255
         raise ValueError
+
+
+class TextBox(BoxBase):
+    def __init__(self, text: str, **kwargs):
+        super().__init__(text, **kwargs)
+        self._box(
+            text=text,
+            border_builder=lambda title: Rectangle(
+                height=_get_text_height(title) + self.border_padding, width=title.get_width() + self.border_padding
+            ),
+        )
+
+
+class NoteBox(BoxBase):
+    def __init__(self, text: str, **kwargs):
+        super().__init__(text, **kwargs)
+
+        def build_border(title: Text):
+            ear_size = title.get_width() * 0.05
+            w = title.get_width() + 0.3 * 2
+            h = title.get_height() + 0.3
+            return Polygon((0, h, 0), (w - ear_size, h, 0), (w, h - ear_size, 0), (w, 0, 0), (0, 0, 0), (0, h, 0))
+
+        self._box(text=text, border_builder=build_border)
+
+
+class Connection(VGroup):
+
+    CONFIG = {"font": ""}
+
+    def __init__(self, source: Mobject, target: Mobject, label: Optional[str] = None, **kwargs):
+        super().__init__(**kwargs)
+        label_direction = UP
+        label_buff = 0
+
+        arrow: Optional[Arrow] = None
+        if source.get_x(RIGHT) <= target.get_x(LEFT):
+            arrow = Arrow(start=source.get_edge_center(RIGHT), end=target.get_edge_center(LEFT), buff=0)
+            label_direction = UP
+        elif source.get_x(LEFT) >= target.get_x(RIGHT):
+            arrow = Arrow(start=source.get_edge_center(LEFT), end=target.get_edge_center(RIGHT), buff=0)
+            label_direction = UP
+        elif source.get_y(DOWN) >= target.get_y(UP):
+            arrow = Arrow(start=source.get_edge_center(DOWN), end=target.get_edge_center(UP), buff=0)
+            label_direction = RIGHT
+            label_buff = VERTICAL_ARROW_LABEL_BUFF
+        elif source.get_y(UP) <= target.get_y(DOWN):
+            arrow = Arrow(start=source.get_edge_center(UP), end=target.get_edge_center(DOWN), buff=0)
+            label_direction = RIGHT
+            label_buff = VERTICAL_ARROW_LABEL_BUFF
+
+        if not arrow:
+            raise ValueError("Unable to connect")
+
+        self.add(arrow)
+        if label:
+            text = Text(label, font=self.font, size=0.7, slant=ITALIC)
+            text.next_to(arrow, direction=label_direction, buff=label_buff)
+            self.add(text)
+
+
+def _get_text_height(text: Text) -> float:
+    return max(Text("Ay", font=text.font).get_height(), text.get_height())

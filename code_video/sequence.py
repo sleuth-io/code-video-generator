@@ -6,14 +6,15 @@ from typing import List
 from typing import Optional
 
 from manim import Arrow
+from manim import config
 from manim import DashedLine
 from manim import DEFAULT_STROKE_WIDTH
 from manim import DOWN
 from manim import ITALIC
 from manim import LEFT
+from manim import MED_LARGE_BUFF
+from manim import MED_SMALL_BUFF
 from manim import RIGHT
-from manim import Scene
-from manim import ShowCreation
 from manim import Text
 from manim import UP
 from manim import VGroup
@@ -22,19 +23,22 @@ from manim.mobject.geometry import DEFAULT_DASH_LENGTH
 from manim.mobject.geometry import Polygon
 from numba import np
 
-from code_video.library import Library
+from code_video.widgets import NoteBox
+from code_video.widgets import TextBox
 
 ARROW_STROKE_WIDTH = DEFAULT_STROKE_WIDTH * 1.2
 
 
 class Actor(VGroup):
+    CONFIG = {"font": ""}
+
     def __init__(self, diagram: SequenceDiagram, title: str, max_y: float):
         super().__init__()
         self.diagram = diagram
 
         self.title = title
 
-        self.block = self.diagram.lib.text_box(title, shadow=True, rounded=True)
+        self.block = TextBox(title, font=self.font, shadow=True, rounded=True)
 
         self.line = DashedLine(
             start=self.block.get_edge_center(DOWN),
@@ -109,6 +113,9 @@ class Actor(VGroup):
 
 
 class Interaction(VGroup):
+
+    CONFIG = {"font": ""}
+
     def __init__(self, source: Actor, label: str = "", target: Optional[Actor] = None, **kwargs):
         super().__init__(**kwargs)
         self.source = source
@@ -124,7 +131,7 @@ class Interaction(VGroup):
             buff=0,
             stroke_width=ARROW_STROKE_WIDTH,
         )
-        text = Text(self.label, font=self.source.diagram.lib.text_font, size=0.7, slant=ITALIC)
+        text = Text(self.label, font=self.font, size=0.7, slant=ITALIC)
         text.next_to(line, direction=UP, buff=0)
         self.add(line, text)
         return self
@@ -146,8 +153,14 @@ class Note(Interaction):
         self.label = label
         self.direction = direction
 
-        block = target.diagram.lib.note_box(
-            self.label, text_attrs={"size": 0.7}, color=WHITE, border_color=WHITE, bg_color="#FFFFFF00", shadow=False
+        block = NoteBox(
+            self.label,
+            font=target.font,
+            text_attrs={"size": 0.7},
+            color=WHITE,
+            border_color=WHITE,
+            bg_color="#FFFFFF00",
+            shadow=False,
         )
         block.next_to(target.get_center(), direction)
         self.add(block)
@@ -215,8 +228,7 @@ class SequenceDiagram(VGroup):
         super().__init__(**kwargs)
         self.actors: Dict[str, Actor] = {}
         self.interactions: List[Interaction] = []
-        self.lib = Library()
-        self.max_y = self.CONFIG["frame_radius_y"] if not max_y else max_y
+        self.max_y = config["frame_y_radius"] if not max_y else max_y
 
     def add_objects(self, *object_names: str):
         for name in object_names:
@@ -247,41 +259,21 @@ class SequenceDiagram(VGroup):
                 last.finish(actor)
         interaction = Interaction(actor)
         self.interactions.append(interaction)
-        return interaction
-
-    def animate(self, scene: Scene):
 
         for actor in self.actors.values():
             actor.stretch(sum(item.get_height() + 0.5 for item in self.interactions))
 
-        max_height = scene.renderer.camera.frame_height - (scene.renderer.camera.frame_height / 2 - self.max_y)
-        if max_height < self.get_height() + 1.5:
-            height_scale = max_height / (self.get_height() + 1.5)
-        else:
-            height_scale = 1
+        return interaction
 
-        if scene.renderer.camera.frame_width < self.get_width() + 5:
-            width_scale = scene.renderer.camera.frame_width / (self.get_width() + 5)
-        else:
-            width_scale = 1
-
-        scale = min(1, height_scale, width_scale)
-
-        self.scale(scale)
-        # self.to_edge(UP)
-        self.set_y(self.max_y, UP)
-        self.to_edge(LEFT)
-        start_y = self.max_y - 1.5 * scale
-
-        scene.play(ShowCreation(self))
-
+    def get_interactions(self):
+        scale = getattr(self, "_overall_scale_factor", 1)
         last: Interaction = None
         for interaction in [item for item in self.interactions if item.target]:
             interaction.scale(scale)
             if not last:
-                interaction.set_y(start_y, direction=UP)
+                interaction.set_y(list(self.actors.values())[0].block.get_y(DOWN) - MED_SMALL_BUFF, direction=UP)
             else:
-                interaction.set_y(last.get_y(DOWN) - 0.5 * scale, direction=UP)
+                interaction.set_y(last.get_y(DOWN) - MED_LARGE_BUFF * scale, direction=UP)
 
-            scene.play(ShowCreation(interaction))
+            yield interaction
             last = interaction
