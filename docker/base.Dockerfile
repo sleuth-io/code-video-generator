@@ -9,4 +9,4 @@ RUN apt update \
 
 # Workaround until this is released: https://github.com/ManimCommunity/manim/issues/632
 RUN pip uninstall pangocairocffi cairocffi \
-    && pip install --no-binary :all: -U pangocairocffi --no-cache
+    && pip install --no-binary :all: -U pangocairocffi>=0.4.0 --no-cache
