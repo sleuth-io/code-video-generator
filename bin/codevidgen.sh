@@ -21,5 +21,5 @@ docker run --rm \
   -v $PWD:/project \
   -w /project \
   mrdonbrown/code-video-generator \
-  codevidgen \
+  manim \
   "$@"
