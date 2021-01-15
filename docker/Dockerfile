@@ -15,9 +15,6 @@ RUN    pip install -qq pybind11 \
 
 COPY patches /app/patches
 
-# Workaround until this is released: https://github.com/ManimCommunity/manim/pull/639
-RUN cd /usr/local/lib/python3.8/site-packages && git apply /app/patches/639.diff
-
 COPY code_video /app/code_video
 COPY code_video_cli /app/code_video_cli
 
