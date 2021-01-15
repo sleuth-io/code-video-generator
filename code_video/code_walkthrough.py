@@ -4,17 +4,12 @@ from typing import Optional
 
 from manim import Code
 from manim import Transform
-from manim.animation.fading import DEFAULT_FADE_LAG_RATIO
 
 
 class HighlightLines(Transform):
     """
     Highlights lines by reducing the opacity of all non-highlighted lines
     """
-
-    CONFIG = {
-        "lag_ratio": DEFAULT_FADE_LAG_RATIO,
-    }
 
     def __init__(self, code: Code, start: int = 1, end: int = -1, **kwargs):
         """

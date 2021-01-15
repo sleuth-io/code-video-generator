@@ -18,6 +18,8 @@ from manim import UP
 from manim import VGroup
 from manim import WHITE
 
+DEFAULT_FONT = "sans-serif"
+
 SHADOW_COLOR = BLACK
 
 SHADOW_OPACITY = 0.3
@@ -30,19 +32,30 @@ VERTICAL_ARROW_LABEL_BUFF = 0.2
 
 
 class BoxBase(VGroup):
-    CONFIG = {
-        "text_attrs": {},
-        "wrap_at": 30,
-        "rounded": False,
-        "shadow": True,
-        "bg_color": "random",
-        "border_color": WHITE,
-        "border_padding": 0.5,
-        "color_palette": ["#00F6F6", "#F6A300", "#7BF600"],
-    }
-
-    def __init__(self, text: str, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(
+        self,
+        text: str,
+        text_attrs=None,
+        wrap_at=30,
+        rounded=False,
+        shadow=True,
+        bg_color="random",
+        border_color=WHITE,
+        border_padding=0.5,
+        color_palette=("#00F6F6", "#F6A300", "#7BF600"),
+        **kwargs,
+    ):
+        super().__init__(text_attrs=text_attrs, **kwargs)
+        self.bg_color = bg_color
+        self.border_color = border_color
+        self.border_padding = (border_padding,)
+        self.color_palette = color_palette
+        self.shadow = shadow
+        self.rounded = rounded
+        self.wrap_at = wrap_at
+        if text_attrs is None:
+            text_attrs = {"font": DEFAULT_FONT}
+        self.text_attrs = text_attrs
         self.text = text
 
     def _box(
@@ -75,7 +88,7 @@ class BoxBase(VGroup):
             self.add_to_back(s_rect)
 
     def _color_and_opacity(self, value: str, text: str):
-        palette = self.CONFIG["color_palette"]
+        palette = self.color_palette
         if value == "random":
             text_hash = int(hashlib.sha1(text.encode()).hexdigest(), 16)
             return palette[text_hash % len(palette)], 0.2
@@ -93,12 +106,14 @@ class TextBox(BoxBase):
     A text with a box around it
     """
 
-    def __init__(self, text: str, **kwargs):
+    def __init__(self, text: str, text_attrs=None, **kwargs):
         """
         Args:
             text: The text to display
         """
-        super().__init__(text, **kwargs)
+        if text_attrs is None:
+            text_attrs = {"size": 0.5, "font": DEFAULT_FONT}
+        super().__init__(text, text_attrs=text_attrs, **kwargs)
         self._box(
             text=text,
             border_builder=lambda title: Rectangle(
@@ -112,12 +127,14 @@ class NoteBox(BoxBase):
     Text with a note box around it
     """
 
-    def __init__(self, text: str, **kwargs):
+    def __init__(self, text: str, text_attrs=None, **kwargs):
         """
         Args:
             text: The text to display
         """
-        super().__init__(text, **kwargs)
+        if text_attrs is None:
+            text_attrs = {"size": 0.5, "font": DEFAULT_FONT}
+        super().__init__(text, text_attrs=text_attrs, **kwargs)
 
         def build_border(title: Text):
             ear_size = title.get_width() * 0.05
@@ -133,16 +150,15 @@ class Connection(VGroup):
     An arrow connection between two objects
     """
 
-    CONFIG = {"font": ""}
-
-    def __init__(self, source: Mobject, target: Mobject, label: Optional[str] = None, **kwargs):
+    def __init__(self, source: Mobject, target: Mobject, label: Optional[str] = None, font=DEFAULT_FONT, **kwargs):
         """
         Args:
             source: The source object
             target: The target object
             label: The optional label text to put over the arrow
         """
-        super().__init__(**kwargs)
+        super().__init__(font=font, **kwargs)
+        self.font = font
         label_direction = UP
         label_buff = 0
 
@@ -167,7 +183,7 @@ class Connection(VGroup):
 
         self.add(arrow)
         if label:
-            text = Text(label, font=self.font, size=0.7, slant=ITALIC)
+            text = Text(label, font=self.font, size=0.5, slant=ITALIC)
             text.next_to(arrow, direction=label_direction, buff=label_buff)
             self.add(text)
 

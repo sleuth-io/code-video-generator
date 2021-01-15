@@ -8,6 +8,7 @@ from manim import UP
 from code_video import AutoScaled
 from code_video import CodeScene
 from code_video import SequenceDiagram
+from code_video.widgets import DEFAULT_FONT
 
 
 class SequenceDiagramsScene(CodeScene):
@@ -25,7 +26,7 @@ class SequenceDiagramsScene(CodeScene):
                     app.ret("Value from db")
                 web.ret("HTML response")
 
-        title = Text("Sequence Diagram")
+        title = Text("Sequence Diagram", font=DEFAULT_FONT, size=0.8)
         title.to_edge(UP)
         self.add(title)
         diagram.next_to(title, DOWN)

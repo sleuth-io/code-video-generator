@@ -14,6 +14,7 @@ from code_video.code_walkthrough import PartialCode
 from code_video.layout import ColumnLayout
 from code_video.music import BackgroundMusic
 from code_video.music import fit_audio
+from code_video.widgets import DEFAULT_FONT
 from code_video.widgets import TextBox
 
 
@@ -24,22 +25,26 @@ class CodeScene(MovingCameraScene):
     with the `HighlightLines` and `HighlightNone` transitions directly.
     """
 
-    CONFIG = {
-        "code_font": "Ubuntu Mono",
-        "text_font": "Helvetica",
-        "code_theme": "fruity",
-    }
-
     def __init__(
         self,
         *args,
+        code_font="Ubuntu Mono",
+        text_font="Helvetica",
+        code_theme="fruity",
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
         self.caption = None
-        self.col_width = self.camera_frame.get_width() / 3
+        self.code_font = code_font
+        self.text_font = text_font
+        self.code_theme = code_theme
+        self.col_width = None
         self.music: Optional[BackgroundMusic] = None
         self.pauses = []
+
+    def setup(self):
+        super().setup()
+        self.col_width = self.camera_frame.get_width() / 3
 
     def add_background_music(self, path: str) -> CodeScene:
         """
@@ -73,11 +78,11 @@ class CodeScene(MovingCameraScene):
         Either waits like normal or if the codevidgen script is used and the "--slides" flag is used,
         it will treat these calls as breaks between slides
         """
-        if config.get("show_slides"):
-            print("In slide mode, skipping wait")
-            self.pauses.append(len(self.renderer.file_writer.partial_movie_files) - 1)
-        else:
-            super().wait(duration, stop_condition)
+        # if config.get("show_slides"):
+        #     print("In slide mode, skipping wait")
+        #     self.pauses.append(len(self.renderer.file_writer.partial_movie_files) - 1)
+        # else:
+        super().wait(duration, stop_condition)
 
     def wait_until_beat(self, wait_time: Union[float, int]):
         """
@@ -194,7 +199,7 @@ class CodeScene(MovingCameraScene):
         if not caption:
             self.play(ApplyMethod(code.full_size))
         else:
-            callout = TextBox(caption, text_attrs=dict(size=0.5))
+            callout = TextBox(caption, text_attrs=dict(size=0.4, font=DEFAULT_FONT))
             callout.align_to(code.line_numbers[start - code.line_no_from], UP)
             callout.set_x(layout.get_x(3), LEFT)
             actions += [HighlightLines(code, start, end), FadeIn(callout)]

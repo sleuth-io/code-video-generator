@@ -19,6 +19,7 @@ from code_video import CodeScene
 from code_video import Connection
 from code_video import SequenceDiagram
 from code_video import TextBox
+from code_video.widgets import DEFAULT_FONT
 
 try:
     __version__ = version(__name__)
@@ -111,7 +112,7 @@ def demo_sequence(scene: CodeScene):
         high-level concepts through sequence diagrams, or
         if you want more control, your own block diagrams:
         """,
-        font="Helvetica",
+        font=DEFAULT_FONT,
         line_spacing=0.5,
     ).scale(0.7)
     scene.play(ShowCreation(title, run_time=4, rate_func=linear))
@@ -120,7 +121,7 @@ def demo_sequence(scene: CodeScene):
 
     scene.add_background(f"{example_dir}/resources/blackboard.jpg")
 
-    title = Text("examples/sequence-diagrams.py")
+    title = Text("examples/sequence-diagrams.py", font=DEFAULT_FONT)
     title.to_edge(UP)
     scene.add(title)
 
@@ -147,7 +148,7 @@ def demo_sequence(scene: CodeScene):
 def demo_boxes(scene: CodeScene):
     scene.add_background(f"{example_dir}/resources/blackboard.jpg")
 
-    title = Text("examples/boxes.py")
+    title = Text("examples/boxes.py", font=DEFAULT_FONT)
     title.to_edge(UP)
     scene.add(title)
     comp1 = TextBox("Component A", shadow=False)
