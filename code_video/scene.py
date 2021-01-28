@@ -143,7 +143,7 @@ class CodeScene(MovingCameraScene):
             path, keep_comments=keep_comments, start_line=start_line, end_line=end_line
         )
 
-        tex = AutoScaled(PartialCode(code=code, line_no_from=start_line, style=self.code_theme))
+        tex = AutoScaled(PartialCode(code=code, start_line=start_line, style=self.code_theme))
         if title is None:
             title = path
 
