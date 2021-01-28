@@ -13,8 +13,6 @@ RUN echo "Version: $VERSION" > /app/PKG-INFO
 RUN    pip install -qq pybind11 \
     && pip install -qq -e .
 
-COPY patches /app/patches
-
 COPY code_video /app/code_video
 COPY code_video_cli /app/code_video_cli
 

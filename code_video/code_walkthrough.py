@@ -72,7 +72,8 @@ class PartialCode(Code):
     Renders source code files or strings in part, delineated by line numbers
     """
 
-    def __init__(self, path: Optional[str] = None, code: Optional[List[str]] = None, extension: str = "py", **kwargs):
+    def __init__(self, path: Optional[str] = None, code: Optional[List[str]] = None,
+                 extension: str = "py", start_line: int = 1, end_line: Optional[int] = None, **kwargs):
         """
         Args:
             path: The source code file path. Either this or `code` must be set
@@ -92,8 +93,13 @@ class PartialCode(Code):
         if path:
             with open(path, "r") as f:
                 code = f.readlines()
+                if end_line:
+                    code = code[start_line:end_line]
+                else:
+                    code = code[start_line:]
+
 
         with NamedTemporaryFile(suffix=f".{extension}") as f:
             f.writelines([line.encode() for line in code])
             f.flush()
-            super().__init__(f.name, **kwargs)
+            super().__init__(f.name, line_no_from=start_line, **kwargs)
