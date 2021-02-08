@@ -127,14 +127,14 @@ def demo_sequence(scene: CodeScene):
 
     diagram = AutoScaled(SequenceDiagram())
     browser, web, app = diagram.add_objects("Browser", "Web", "App")
-    with browser:
-        with web.text("Make a request"):
-            web.to_target("Request with no response", app)
-            with app.text("Retrieve a json object"):
-                app.to_self("Calls itself")
-                app.note("Do lots and lots and lots of thinking")
-                app.ret("Value from db")
-            web.ret("HTML response")
+
+    browser.to(web, "Make a request")
+    web.to(app, "Request with no response")
+    web.to(app, "Retrieve a json object")
+    app.to(app, "Calls itself")
+    app.note("Do lots and lots and lots of thinking")
+    app.to(web, "Value from db")
+    web.to(browser, "HTML response")
 
     diagram.next_to(title, DOWN)
     scene.play(ShowCreation(diagram))

@@ -70,91 +70,54 @@ class Actor(VGroup):
         self.bblock.next_to(self.line, direction=DOWN, buff=0)
         self.add(self.line, self.bblock)
 
-    def text(self, value):
-        self.diagram.interactions[-1].label = value
+    def to(self, target: Actor, message: Optional[str] = None):
+        """
+        Adds an arrow to the next target. If the next target is the same as the source,
+        render a self arrow
+
+        Args:
+            target: The target actor
+            message: The arrow text
+        """
+
+        if self == target:
+            interaction = SelfArrow(self, message)
+        else:
+            interaction = ActorArrow(self, target, message if message else "")
+        self.diagram.add_interaction(interaction)
         return self
 
-    def note(self, value: str):
+    def note(self, message: str):
         """
         Adds a note to the right of the actor
 
         Args:
-            value: The text of the note
+            message: The text of the note
         """
-        note_interaction = Note(self, value, RIGHT)
-        interaction = self.diagram.interactions[-1]
-        if not interaction.target:
-            self.diagram.interactions.insert(-1, note_interaction)
-        else:
-            self.diagram.interactions.append(note_interaction)
+        note_interaction = Note(self, message, RIGHT)
+        self.diagram.add_interaction(note_interaction)
+        return self
 
-    def to_self(self, value: str):
-        """
-        Adds an arrow to itself with a label
-
-        Args:
-            value: The label text
-        """
-        note_interaction = SelfArrow(self, value)
-        interaction = self.diagram.interactions[-1]
-        if not interaction.target:
-            self.diagram.interactions.insert(-1, note_interaction)
-        else:
-            self.diagram.interactions.append(note_interaction)
-
-    def to_target(self, value: str, target: Actor):
-        """
-        Adds an arrow to the next target
-
-        Args:
-            value: The arrow text
-            target: The target actor
-        """
-        note_interaction = Interaction(source=self, label=value).finish(target)
-        interaction = self.diagram.interactions[-1]
-        if not interaction.target:
-            self.diagram.interactions.insert(-1, note_interaction)
-        else:
-            self.diagram.interactions.append(note_interaction)
-
-    def ret(self, value: str):
-        """
-        Sets the text on the return interaction
-
-        Args:
-            value: The label text
-        """
-        interaction = self.diagram.interactions[-1]
-        if not interaction.target:
-            interaction = self.diagram.start_interaction(self)
-        interaction.label = value
-        return self.cur_interaction
-
-    def __enter__(self):
-        interaction = self.diagram.start_interaction(self)
-        self.cur_interaction = interaction
-        return self.cur_interaction
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        interaction = self.diagram.start_interaction(self)
-        self.cur_interaction = interaction
-        return self.cur_interaction
+    def __str__(self):
+        return f"Actor ({self.title})"
 
 
 class Interaction(VGroup):
+    def __init__(self, source, *vmobjects, **kwargs):
+        super().__init__(*vmobjects, **kwargs)
+        self.source = source
+
+
+class ActorArrow(Interaction):
     """
     An interaction that can be displayed on the screen
     """
 
-    def __init__(self, source: Actor, label: str = "", target: Optional[Actor] = None, font=DEFAULT_FONT, **kwargs):
-        super().__init__(font=font, **kwargs)
-        self.source = source
+    def __init__(self, source: Actor, target: Actor, label: str = "", font=DEFAULT_FONT, **kwargs):
+        super().__init__(source, font=font, **kwargs)
         self.target = target
         self.label = label
         self.font = font
-
-    def finish(self, target: Actor):
-        self.target = target
 
         line = Arrow(
             start=[self.source.get_center()[0], 0, 0],
@@ -165,7 +128,6 @@ class Interaction(VGroup):
         text = Text(self.label, font=self.font, size=0.5, slant=ITALIC)
         text.next_to(line, direction=UP, buff=0)
         self.add(line, text)
-        return self
 
     def scale(self, scale_factor, **kwargs):
         super().scale(scale_factor, **kwargs)
@@ -176,24 +138,29 @@ class Interaction(VGroup):
         self.submobjects[1].next_to(self.submobjects[0], direction=UP, buff=0)
         return self
 
+    def __str__(self):
+        result = f"Interaction ({self.source.title}->{self.target.title if self.target else '?'})"
+        if self.label:
+            result += f" - {self.label}"
+        return result
+
 
 class Note(Interaction):
-    def __init__(self, target: Actor, label: str, direction: np.array):
-        super().__init__(target)
-        self.target = target
+    def __init__(self, source: Actor, label: str, direction: np.array):
+        super().__init__(source)
         self.label = label
         self.direction = direction
 
         block = NoteBox(
             self.label,
-            font=target.font,
-            text_attrs={"size": 0.5, "font": target.font},
+            font=source.font,
+            text_attrs={"size": 0.5, "font": source.font},
             color=WHITE,
             border_color=WHITE,
             bg_color="#FFFFFF00",
             shadow=False,
         )
-        block.next_to(target.get_center(), direction)
+        block.next_to(source.get_center(), direction)
         self.add(block)
 
     def scale(self, scale_factor, **kwargs):
@@ -202,46 +169,43 @@ class Note(Interaction):
             obj.next_to(self.source.get_center(), direction=self.direction)
         return self
 
-    def finish(self, target: Actor):
-        raise NotImplementedError()
-
 
 class SelfArrow(Interaction):
-    def __init__(self, target: Actor, label: str):
-        super().__init__(target)
-        self.target = target
+    def __init__(self, source: Actor, label: str):
+        super().__init__(source)
         self.label = "\n".join(wrap(label, 30))
 
         line_block = VGroup()
 
         spacing = 0.4
         distance = 0.8
+        center_x = source.get_center()[0]
         line = Polygon(
-            [target.get_center()[0], spacing, 0],
-            [target.get_center()[0] + distance, spacing, 0],
-            [target.get_center()[0] + distance, -1 * spacing, 0],
-            [target.get_center()[0] + distance / 2, -1 * spacing, 0],
-            [target.get_center()[0] + distance, -1 * spacing, 0],
-            [target.get_center()[0] + distance, spacing, 0],
-            [target.get_center()[0], spacing, 0],
+            [center_x, spacing, 0],
+            [center_x + distance, spacing, 0],
+            [center_x + distance, -1 * spacing, 0],
+            [center_x + distance / 2, -1 * spacing, 0],
+            [center_x + distance, -1 * spacing, 0],
+            [center_x + distance, spacing, 0],
+            [center_x, spacing, 0],
             color=WHITE,
         )
         line.set_stroke(width=ARROW_STROKE_WIDTH)
 
         arrow = Arrow(
-            start=[target.get_center()[0] + distance, -1 * spacing, 0],
-            end=[target.get_center()[0], -1 * spacing, 0],
+            start=[center_x + distance, -1 * spacing, 0],
+            end=[center_x, -1 * spacing, 0],
             buff=0,
             stroke_width=ARROW_STROKE_WIDTH,
         )
         line_block.add(line, arrow)
 
-        title = Text(self.label, font="Sans", size=0.5, slant=ITALIC)
+        title = Text(self.label, font=self.source.font, size=0.5, slant=ITALIC)
         title.next_to(line_block)
 
         block = VGroup()
         block.add(line_block, title)
-        block.next_to(target.get_center(), RIGHT)
+        block.next_to(source.get_center(), RIGHT)
         self.add(block)
 
     def scale(self, scale_factor, **kwargs):
@@ -249,9 +213,6 @@ class SelfArrow(Interaction):
             obj.scale(scale_factor, **kwargs)
             obj.next_to(self.source.get_center(), direction=RIGHT, buff=0)
         return self
-
-    def finish(self, target: Actor):
-        raise NotImplementedError()
 
 
 class SequenceDiagram(VGroup):
@@ -289,14 +250,7 @@ class SequenceDiagram(VGroup):
 
         return self.actors.values()
 
-    def start_interaction(self, actor: Actor):
-        if self.interactions:
-            last = self.interactions[-1]
-            if last.source == actor:
-                return last
-            elif not last.target:
-                last.finish(actor)
-        interaction = Interaction(actor)
+    def add_interaction(self, interaction: Interaction):
         self.interactions.append(interaction)
 
         for actor in self.actors.values():
@@ -310,7 +264,7 @@ class SequenceDiagram(VGroup):
         """
         scale = getattr(self, "_overall_scale_factor", 1)
         last: Interaction = None
-        for interaction in [item for item in self.interactions if item.target]:
+        for interaction in [item for item in self.interactions]:
             interaction.scale(scale)
             if not last:
                 interaction.set_y(list(self.actors.values())[0].block.get_y(DOWN) - MED_SMALL_BUFF, direction=UP)

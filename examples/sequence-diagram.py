@@ -17,14 +17,14 @@ class SequenceDiagramsScene(CodeScene):
         self.add_background(f"{example_dir}/resources/blackboard.jpg")
         diagram = AutoScaled(SequenceDiagram())
         browser, web, app = diagram.add_objects("Browser", "Web", "App")
-        with browser:
-            with web.text("Make a request"):
-                web.to_target("Do a quick thing", app)
-                with app.text("Retrieve a json object"):
-                    app.to_self("Calls itself")
-                    app.note("Do lots and lots and lots of thinking")
-                    app.ret("Value from db")
-                web.ret("HTML response")
+
+        browser.to(web, "Make a request")
+        web.to(app, "Do a quick thing")
+        web.to(app, "Retrieve a json object")
+        app.to(app, "Call itself")
+        app.note("Do lots and lots and lots of thinking")
+        app.to(web, "Value from db")
+        web.to(browser, "HTML response")
 
         title = Text("Sequence Diagram", font=DEFAULT_FONT, size=0.8)
         title.to_edge(UP)
