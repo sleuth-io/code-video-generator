@@ -1,6 +1,8 @@
 import argparse
 import sys
 
+config = {}
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -14,9 +16,8 @@ def main():
     sys.argv = [sys.argv[0].replace("codevidgen", "manim")] + extra
 
     from manim.__main__ import main as manim_main
-    from manim import config
     config["show_slides"] = args.slides
-    config["slide_stops"] = []
+    config["slide_stops"] = {}
     manim_main()
     if args.slides:
         from code_video.player import VideoPlayer
@@ -32,6 +33,9 @@ def main():
                 if clip:
                     player.add_movies(*clip)
                     clip.clear()
+                extra_movies = pauses[idx]
+                if extra_movies:
+                    player.add_movies(*extra_movies)
 
         if clip:
             player.add_movies(*clip)

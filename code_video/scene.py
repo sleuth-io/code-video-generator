@@ -4,7 +4,20 @@ import os
 from typing import Optional
 from typing import Union
 
-from manim import *
+from manim import ApplyMethod
+from manim import Code
+from manim import DEFAULT_WAIT_TIME
+from manim import DOWN
+from manim import FadeIn
+from manim import FadeOut
+from manim import ImageMobject
+from manim import LEFT
+from manim import MovingCameraScene
+from manim import RIGHT
+from manim import ShowCreation
+from manim import Text
+from manim import UP
+from manim import WHITE
 
 from code_video import comment_parser
 from code_video.autoscale import AutoScaled
@@ -16,6 +29,7 @@ from code_video.music import BackgroundMusic
 from code_video.music import fit_audio
 from code_video.widgets import DEFAULT_FONT
 from code_video.widgets import TextBox
+from code_video_cli import config
 
 
 class CodeScene(MovingCameraScene):
@@ -40,7 +54,7 @@ class CodeScene(MovingCameraScene):
         self.code_theme = code_theme
         self.col_width = None
         self.music: Optional[BackgroundMusic] = None
-        self.pauses = []
+        self.pauses = {}
 
     def setup(self):
         super().setup()
@@ -70,7 +84,7 @@ class CodeScene(MovingCameraScene):
 
         if self.pauses:
             config["slide_videos"] = self.renderer.file_writer.partial_movie_files[:]
-            config["slide_stops"].extend(self.pauses)
+            config["slide_stops"].update(self.pauses)
             config["movie_file_path"] = self.renderer.file_writer.movie_file_path
 
     def wait(self, duration=DEFAULT_WAIT_TIME, stop_condition=None):
@@ -78,11 +92,18 @@ class CodeScene(MovingCameraScene):
         Either waits like normal or if the codevidgen script is used and the "--slides" flag is used,
         it will treat these calls as breaks between slides
         """
-        # if config.get("show_slides"):
-        #     print("In slide mode, skipping wait")
-        #     self.pauses.append(len(self.renderer.file_writer.partial_movie_files) - 1)
-        # else:
-        super().wait(duration, stop_condition)
+        if config.get("show_slides"):
+            print("In slide mode, skipping wait")
+            super().wait(0.5)
+            index = len(self.renderer.file_writer.partial_movie_files) - 1
+            self.pauses[index] = []
+        else:
+            super().wait(duration, stop_condition)
+
+    def play_movie(self, path: str):
+        if config.get("show_slides"):
+            index = len(self.renderer.file_writer.partial_movie_files) - 1
+            self.pauses[index].append(path)
 
     def wait_until_beat(self, wait_time: Union[float, int]):
         """
