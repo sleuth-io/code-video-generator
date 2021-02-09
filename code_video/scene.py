@@ -234,7 +234,7 @@ class CodeScene(MovingCameraScene):
             wait_time = len(self.caption.text) / (200 * 5 / 60)
             self.wait_until_measure(wait_time, -1.5)
 
-    def highlight_line(self, code: AutoScaled, number: int = -1, caption: Optional[str] = None):
+    def highlight_line(self, code: Code, number: int = -1, caption: Optional[str] = None):
         """
         Convenience method for highlighting a single line
 
@@ -245,7 +245,7 @@ class CodeScene(MovingCameraScene):
         """
         return self.highlight_lines(code, number, number, caption=caption)
 
-    def highlight_none(self, code: AutoScaled):
+    def highlight_none(self, code: Code):
         """
         Convenience method for resetting any existing highlighting.
 
