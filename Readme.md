@@ -16,7 +16,7 @@ The documention is hosted at [Read the Docs](https://code-video-generator.readth
 
 Code Video Generator needs Manim and a few other dependencies. Please visit
 the
-[documentation](https://code-video-generator.readthedocs.io/en/latest/installation.html).
+[documentation](https://code-video-generator.readthedocs.io/en/latest/installation/).
 
 ## Usage
 
