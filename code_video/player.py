@@ -25,6 +25,7 @@ class VideoPlayer:
         self._window.event(self.on_key_press)
         self._player = pyglet.media.Player()
         self._clips: List[Clip] = []
+        self._clip_pos: int = 0
         self._clip_file_pattern = clip_file_pattern
         self.video_y: Optional[int] = None
 
@@ -66,10 +67,11 @@ class VideoPlayer:
         return self
 
     def play(self):
-        clip = self._clips.pop(0)
+        clip = self._clips[self._clip_pos]
         self._player.queue(clip.source)
         self._player.play()
         pyglet.app.run()
+
         return [video.file for video in self._clips]
 
     def on_draw(self):
@@ -89,8 +91,19 @@ class VideoPlayer:
                 self._window.close()
                 return
             print("Next video")
+            self._clip_pos += 1
             self._player.pause()
             self.play()
+
+        if symbol in (key.PAGEUP, key.LEFT):
+            if self._clip_pos == 0:
+                return
+
+            print("Previous video")
+            self._clip_pos -= 1
+            self._player.pause()
+            self.play()
+
 
 
 if __name__ == "__main__":

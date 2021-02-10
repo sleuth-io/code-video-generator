@@ -101,9 +101,9 @@ class PartialCode(Code):
             with open(path, "r") as f:
                 code = f.readlines()
                 if end_line:
-                    code = code[start_line:end_line]
+                    code = code[start_line-1:end_line]
                 else:
-                    code = code[start_line:]
+                    code = code[start_line-1:]
 
         with NamedTemporaryFile(suffix=f".{extension}") as f:
             f.writelines([line.encode() for line in code])
