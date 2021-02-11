@@ -105,6 +105,5 @@ class VideoPlayer:
             self.play()
 
 
-
 if __name__ == "__main__":
     VideoPlayer("clip-{index}.mp4").add_movies(*sys.argv[1:-1]).add_movies(*sys.argv[-1:]).play()

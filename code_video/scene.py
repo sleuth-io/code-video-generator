@@ -77,9 +77,13 @@ class CodeScene(MovingCameraScene):
     def tear_down(self):
         super().tear_down()
         if self.music:
-            self.time = 0
             file = fit_audio(self.music.file, self.renderer.time + 2)
-            self.add_sound(file)
+            old = self.renderer.skip_animations
+            try:
+                self.renderer.skip_animations = False
+                self.add_sound(file, time_offset=-1 * self.renderer.time)
+            finally:
+                self.renderer.skip_animations = old
             os.remove(file)
 
         if self.pauses:
