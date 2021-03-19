@@ -58,7 +58,7 @@ class CodeScene(MovingCameraScene):
 
     def setup(self):
         super().setup()
-        self.col_width = self.camera_frame.get_width() / 3
+        self.col_width = self.renderer.camera.frame_width / 3
 
     def add_background_music(self, path: str) -> CodeScene:
         """
@@ -139,8 +139,8 @@ class CodeScene(MovingCameraScene):
             path: The file path of the image file
         """
 
-        background = ImageMobject(path, height=self.camera_frame.get_height())
-        background.stretch_to_fit_width(self.camera_frame.get_width())
+        background = ImageMobject(path, height=self.renderer.camera.frame_height)
+        background.stretch_to_fit_width(self.renderer.camera.frame_width)
         self.add(background)
         return background
 

@@ -1,4 +1,4 @@
-FROM mrdonbrown/code-video-generator-base:base-e0f61c1
+FROM mrdonbrown/code-video-generator-base:base-f72a644
 
 WORKDIR /app
 
