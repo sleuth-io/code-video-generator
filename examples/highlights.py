@@ -9,7 +9,7 @@ class HighlightScene(CodeScene):
     def construct(self):
         example_dir = dirname(__file__)
         tex = self.create_code(f"{example_dir}/highlights.py")
-        self.play(ShowCreation(tex))
+        self.play(Create(tex))
         self.highlight_lines(
             tex,
             13,

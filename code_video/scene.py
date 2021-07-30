@@ -14,10 +14,10 @@ from manim import ImageMobject
 from manim import LEFT
 from manim import MovingCameraScene
 from manim import RIGHT
-from manim import ShowCreation
 from manim import Text
 from manim import UP
 from manim import WHITE
+from manim.animation.creation import Create
 
 from code_video import comment_parser
 from code_video.autoscale import AutoScaled
@@ -176,7 +176,7 @@ class CodeScene(MovingCameraScene):
         self.add(title)
         tex.next_to(title, DOWN)
 
-        self.play(ShowCreation(tex))
+        self.play(Create(tex))
         self.wait()
 
         for comment in comments:

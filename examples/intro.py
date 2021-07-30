@@ -10,9 +10,9 @@ from manim import LEFT
 from manim import linear
 from manim import MED_LARGE_BUFF
 from manim import RIGHT
-from manim import ShowCreation
 from manim import Text
 from manim import UP
+from manim.animation.creation import Create
 
 from code_video import AutoScaled
 from code_video import CodeScene
@@ -34,7 +34,7 @@ def title_scene(scene):
 
     scene.add_background(f"{example_dir}/resources/blackboard.jpg")
     title = Text("How to use Code Video Generator", font="Helvetica")
-    scene.play(ShowCreation(title))
+    scene.play(Create(title))
     scene.play(
         FadeIn(
             Text(f"Code and examples from version {__version__}", font="Helvetica")
@@ -58,7 +58,7 @@ def overview(scene):
         font="Helvetica",
         line_spacing=0.5,
     ).scale(0.7)
-    scene.play(ShowCreation(title, run_time=10, rate_func=linear))
+    scene.play(Create(title, run_time=10, rate_func=linear))
     scene.wait(3)
     sub = (
         Text(
@@ -70,7 +70,7 @@ def overview(scene):
         .scale(0.7)
         .next_to(title, direction=DOWN, buff=MED_LARGE_BUFF, aligned_edge=LEFT)
     )
-    scene.play(ShowCreation(sub))
+    scene.play(Create(sub))
     scene.wait(2)
     scene.clear()
 
@@ -115,7 +115,7 @@ def demo_sequence(scene: CodeScene):
         font=DEFAULT_FONT,
         line_spacing=0.5,
     ).scale(0.7)
-    scene.play(ShowCreation(title, run_time=4, rate_func=linear))
+    scene.play(Create(title, run_time=4, rate_func=linear))
     scene.wait(3)
     scene.clear()
 
@@ -137,9 +137,9 @@ def demo_sequence(scene: CodeScene):
     web.to(browser, "HTML response")
 
     diagram.next_to(title, DOWN)
-    scene.play(ShowCreation(diagram))
+    scene.play(Create(diagram))
     for interaction in diagram.get_interactions():
-        scene.play(ShowCreation(interaction))
+        scene.play(Create(interaction))
     scene.wait(3)
     scene.play(FadeOut(diagram), *[FadeOut(item) for item in diagram.interactions])
     scene.clear()
@@ -163,10 +163,10 @@ def demo_boxes(scene: CodeScene):
 
     scene.play(FadeIn(comp2))
     scene.wait_until_beat(1)
-    scene.play(ShowCreation(arrow1))
+    scene.play(Create(arrow1))
     scene.play(FadeIn(comp1))
     scene.wait_until_beat(1)
-    scene.play(ShowCreation(arrow2))
+    scene.play(Create(arrow2))
     scene.play(FadeIn(comp3))
 
     scene.wait_until_beat(4)
@@ -185,7 +185,7 @@ def goodbye(scene: CodeScene):
         line_spacing=0.5,
     ).scale(0.7)
     title.to_edge(LEFT)
-    scene.play(ShowCreation(title, run_time=4, rate_func=linear))
+    scene.play(Create(title, run_time=4, rate_func=linear))
     scene.wait(5)
     scene.play(FadeOut(title))
 

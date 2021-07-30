@@ -3,7 +3,7 @@ from manim import FadeIn
 from manim import LEFT
 from manim import RIGHT
 from manim import Scene
-from manim import ShowCreation
+from manim.animation.creation import Create
 
 from code_video import Connection
 from code_video import TextBox
@@ -22,9 +22,9 @@ class BoxesScene(Scene):
         arrow2 = Connection(comp1, comp3, "Another thing")
 
         self.play(FadeIn(comp2))
-        self.play(ShowCreation(arrow1))
+        self.play(Create(arrow1))
         self.play(FadeIn(comp1))
-        self.play(ShowCreation(arrow2))
+        self.play(Create(arrow2))
         self.play(FadeIn(comp3))
 
         self.wait(5)
