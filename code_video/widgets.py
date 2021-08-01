@@ -45,7 +45,7 @@ class BoxBase(VGroup):
         color_palette=("#00F6F6", "#F6A300", "#7BF600"),
         **kwargs,
     ):
-        super().__init__(text_attrs=text_attrs, **kwargs)
+        super().__init__(**kwargs)
         self.bg_color = bg_color
         self.border_color = border_color
         self.border_padding = (border_padding,)
@@ -106,13 +106,15 @@ class TextBox(BoxBase):
     A text with a box around it
     """
 
-    def __init__(self, text: str, text_attrs=None, **kwargs):
+    def __init__(self, text: str, font=None, text_attrs=None, **kwargs):
         """
         Args:
             text: The text to display
         """
         if text_attrs is None:
             text_attrs = {"size": 0.5, "font": DEFAULT_FONT}
+        if font:
+            text_attrs["font"] = font
         super().__init__(text, text_attrs=text_attrs, **kwargs)
         self._box(
             text=text,
@@ -127,13 +129,15 @@ class NoteBox(BoxBase):
     Text with a note box around it
     """
 
-    def __init__(self, text: str, text_attrs=None, **kwargs):
+    def __init__(self, text: str, font=None, text_attrs=None, **kwargs):
         """
         Args:
             text: The text to display
         """
         if text_attrs is None:
             text_attrs = {"size": 0.5, "font": DEFAULT_FONT}
+        if font:
+            text_attrs["font"] = font
         super().__init__(text, text_attrs=text_attrs, **kwargs)
 
         def build_border(title: Text):
@@ -157,7 +161,7 @@ class Connection(VGroup):
             target: The target object
             label: The optional label text to put over the arrow
         """
-        super().__init__(font=font, **kwargs)
+        super().__init__(**kwargs)
         self.font = font
         label_direction = UP
         label_buff = 0

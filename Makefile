@@ -14,7 +14,7 @@ pyenv: ## Install and setup local py env
 clean: pyenv ## Clean the project and set everything up
 
 run: ## Generate the video and preview
-	manim examples/commented.py -ql -p
+	manim render -ql -p examples/commented.py
 
 lint: ## Run Python linters
 	flake8 examples
@@ -43,7 +43,7 @@ build: ## Build docker image
 
 EXAMPLES_DIR = ./examples
 examples: ## Builds all examples
-	$(foreach file, $(wildcard $(EXAMPLES_DIR)/*.py), manim -ql $(file);)
+	$(foreach file, $(wildcard $(EXAMPLES_DIR)/*.py), manim render -ql $(file);)
 
 build-examples: build ## Builds all examples in the docker container
-	$(foreach file, $(wildcard $(EXAMPLES_DIR)/*.py), docker run -v $(PWD):/project -w /project --rm codevidgen-dev	manim --dry_run -ql $(file);)
+	$(foreach file, $(wildcard $(EXAMPLES_DIR)/*.py), docker run -v $(PWD):/project -w /project --rm codevidgen-dev	manim render --dry_run -ql $(file);)

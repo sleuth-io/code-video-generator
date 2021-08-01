@@ -139,7 +139,8 @@ class CodeScene(MovingCameraScene):
             path: The file path of the image file
         """
 
-        background = ImageMobject(path, height=self.renderer.camera.frame_height)
+        background = ImageMobject(path)
+        background.height = self.renderer.camera.frame_height
         background.stretch_to_fit_width(self.renderer.camera.frame_width)
         self.add(background)
         return background
