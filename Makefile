@@ -46,4 +46,4 @@ examples: ## Builds all examples
 	$(foreach file, $(wildcard $(EXAMPLES_DIR)/*.py), manim render -ql $(file);)
 
 build-examples: build ## Builds all examples in the docker container
-	$(foreach file, $(wildcard $(EXAMPLES_DIR)/*.py), docker run -v $(PWD):/project -w /project --rm codevidgen-dev	manim render --dry_run -ql $(file);)
+	$(foreach file, $(wildcard $(EXAMPLES_DIR)/*.py), docker run -v $(PWD):/project -w /project --rm codevidgen-dev	manim render -ql $(file);)
