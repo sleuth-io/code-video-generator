@@ -8,8 +8,9 @@ help:
 
 pyenv: ## Install and setup local py env
 	python3.9 -m venv venv
+	venv/bin/pip install pip-tools
+	venv/bin/pip-compile
 	venv/bin/pip install -r requirements.txt
-	cd venv/lib/python3.9/site-packages && cd -
 
 clean: pyenv ## Clean the project and set everything up
 
