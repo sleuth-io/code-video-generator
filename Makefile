@@ -9,10 +9,10 @@ help:
 pyenv: ## Install and setup local py env
 	python3.9 -m venv venv
 	venv/bin/pip install pip-tools
-	venv/bin/pip-compile
 	venv/bin/pip install -r requirements.txt
 
 clean: pyenv ## Clean the project and set everything up
+	venv/bin/pip-compile
 
 run: ## Generate the video and preview
 	manim render -ql -p examples/commented.py
@@ -40,11 +40,11 @@ format: ## Format Python code
 	reorder-python-imports --py38-plus `find code_video -name "*.py"` || black code_video --target-version py38
 
 build: ## Build docker image
-	docker build -t codevidgen-dev --build-arg VERSION=`python setup.py --version` -f docker/Dockerfile .
+	docker build -t codevidgen-dev --build-arg VERSION=`venv/bin/python setup.py --version` -f docker/Dockerfile .
 
 EXAMPLES_DIR = ./examples
 examples: ## Builds all examples
 	$(foreach file, $(wildcard $(EXAMPLES_DIR)/*.py), manim render -ql $(file);)
 
-build-examples: build ## Builds all examples in the docker container
+build-examples: pyenv build ## Builds all examples in the docker container
 	$(foreach file, $(wildcard $(EXAMPLES_DIR)/*.py), docker run -v $(PWD):/project -w /project --rm codevidgen-dev	manim render -ql $(file);)
