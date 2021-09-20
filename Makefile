@@ -7,9 +7,9 @@ help:
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
 
 pyenv: ## Install and setup local py env
-	python3.8 -m venv venv
+	python3.9 -m venv venv
 	venv/bin/pip install -r requirements.txt
-	cd venv/lib/python3.8/site-packages && cd -
+	cd venv/lib/python3.9/site-packages && cd -
 
 clean: pyenv ## Clean the project and set everything up
 
