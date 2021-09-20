@@ -30,8 +30,7 @@ jobs:
           ${{ runner.os }}-
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
+        make pyenv
     - name: Check format and linters
       run: |
         make check-format

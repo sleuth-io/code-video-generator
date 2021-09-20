@@ -1,6 +1,6 @@
 from os.path import dirname
 
-from manim import *
+from manim import Create
 
 from code_video import CodeScene
 
