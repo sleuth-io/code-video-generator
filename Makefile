@@ -9,7 +9,7 @@ help:
 pyenv: ## Install and setup local py env
 	python3.9 -m venv venv
 	venv/bin/pip install pip-tools
-	venv/bin/pip install -r requirements-dev.txt
+	venv/bin/pip install -r requirements-dev.txt -e .
 
 clean: pyenv ## Clean the project and set everything up
 	venv/bin/pip-compile --extra dev -o requirements-dev.txt
