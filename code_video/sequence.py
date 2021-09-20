@@ -47,7 +47,6 @@ class Actor(VGroup):
         self.line = DashedLine(
             start=self.block.get_edge_center(DOWN),
             end=[self.block.get_center()[0], self.block.get_bottom()[1], 0],
-            stroke_style="dashed",
             dash_length=DEFAULT_DASH_LENGTH * 2,
             stroke_width=DEFAULT_STROKE_WIDTH / 2,
             positive_space_ratio=0.5,
@@ -61,7 +60,6 @@ class Actor(VGroup):
         self.line = DashedLine(
             start=self.block.get_edge_center(DOWN),
             end=[self.block.get_center()[0], self.block.get_bottom()[1] - middle_height, 0],
-            stroke_style="dashed",
             dash_length=DEFAULT_DASH_LENGTH * 2,
             stroke_width=DEFAULT_STROKE_WIDTH / 2,
             positive_space_ratio=0.5,
@@ -114,7 +112,7 @@ class ActorArrow(Interaction):
     """
 
     def __init__(self, source: Actor, target: Actor, label: str = "", font=DEFAULT_FONT, **kwargs):
-        super().__init__(source, font=font, **kwargs)
+        super().__init__(source, **kwargs)
         self.target = target
         self.label = label
         self.font = font

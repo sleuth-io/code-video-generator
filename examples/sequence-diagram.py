@@ -1,9 +1,9 @@
 from os.path import dirname
 
 from manim import DOWN
-from manim import ShowCreation
 from manim import Text
 from manim import UP
+from manim.animation.creation import Create
 
 from code_video import AutoScaled
 from code_video import CodeScene
@@ -31,8 +31,8 @@ class SequenceDiagramsScene(CodeScene):
         self.add(title)
         diagram.next_to(title, DOWN)
 
-        self.play(ShowCreation(diagram))
+        self.play(Create(diagram))
         for interaction in diagram.get_interactions():
-            self.play(ShowCreation(interaction))
+            self.play(Create(interaction))
 
         self.wait(5)
