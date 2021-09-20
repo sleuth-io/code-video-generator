@@ -20,16 +20,16 @@ run: ## Generate the video and preview
 	manim render -ql -p examples/commented.py
 
 lint: ## Run Python linters
-	flake8 examples
-	flake8 code_video
-	pylint examples
-	pylint code_video
+	venv/bin/flake8 examples
+	venv/bin/flake8 code_video
+	venv/bin/pylint examples
+	venv/bin/pylint code_video
 
 check-format: lint ## Check Python code formatting
-	black examples --check --target-version py38
-	black code_video --check --target-version py38
-	reorder-python-imports --py38-plus `find code_video -name "*.py"`
-	reorder-python-imports --py38-plus `find examples -name "*.py"`
+	venv/bin/black examples --check --target-version py38
+	venv/bin/black code_video --check --target-version py38
+	venv/bin/reorder-python-imports --py38-plus `find code_video -name "*.py"`
+	venv/bin/reorder-python-imports --py38-plus `find examples -name "*.py"`
 
 docs: ## Serve the docs
 	mkdocs serve -a localhost:8035
