@@ -9,10 +9,12 @@ help:
 pyenv: ## Install and setup local py env
 	python3.9 -m venv venv
 	venv/bin/pip install pip-tools
-	venv/bin/pip install -r requirements.txt
+	venv/bin/pip install -r requirements-dev.txt
 
 clean: pyenv ## Clean the project and set everything up
-	venv/bin/pip-compile
+	venv/bin/pip-compile --extra dev -o requirements-dev.txt
+	venv/bin/pip-compile -o requirements.txt
+
 
 run: ## Generate the video and preview
 	manim render -ql -p examples/commented.py
