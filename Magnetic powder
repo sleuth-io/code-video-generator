@@ -1,0 +1,6 @@
+from code_video import CodeScene
+
+class MyScene(CodeScene):
+    def construct(self):
+        self.animate_code_comments("simple.py")
+        self.wait(5)
