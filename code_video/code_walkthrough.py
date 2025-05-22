@@ -1,3 +1,4 @@
+import os
 from tempfile import NamedTemporaryFile
 from typing import List
 from typing import Optional
@@ -105,7 +106,11 @@ class PartialCode(Code):
                 else:
                     code = code[start_line - 1 :]
 
-        with NamedTemporaryFile(suffix=f".{extension}") as f:
-            f.writelines([line.encode() for line in code])
-            f.flush()
-            super().__init__(f.name, line_no_from=start_line, **kwargs)
+        temp_file = NamedTemporaryFile(suffix=f".{extension}", delete=False)
+        try:
+            temp_file.writelines([line.encode() for line in code])
+            temp_file.flush()
+            temp_file.close() # Close the file before super().__init__
+            super().__init__(temp_file.name, line_no_from=start_line, **kwargs)
+        finally:
+            os.remove(temp_file.name) # Ensure deletion
