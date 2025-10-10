@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Everyday Heroes: Mental Health Day Short</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7fafc;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .scene-container {
+            min-height: 200px;
+            background: linear-gradient(135deg, #e0f2fe 0%, #ffffff 100%);
+            border: 2px solid #3b82f6;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .speaker-tag {
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 8px;
+            display: inline-block;
+        }
+        .speaker-Riya { background-color: #fca5a5; color: #7f1d1d; } /* Red for Riya's stress */
+        .speaker-Aman { background-color: #a5f3fc; color: #0e7490; } /* Cyan for Aman's isolation */
+        .speaker-Meena { background-color: #a7f3d0; color: #065f46; } /* Green for Meena's support */
+        .speaker-Voiceover { background-color: #c4b5fd; color: #4c1d95; } /* Violet for main message */
+        .subtitle {
+            font-size: 1.125rem; /* text-lg */
+            line-height: 1.75rem;
+            color: #1f2937;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="container flex flex-col items-center space-y-8">
+        <header class="text-center">
+            <h1 class="text-4xl font-extrabold text-blue-700">🎬 Everyday Heroes</h1>
+            <p class="text-xl text-gray-600 mt-2">World Mental Health Day: TTS Video Simulation</p>
+        </header>
+
+        <!-- Video Screen Simulation -->
+        <div id="videoScreen" class="scene-container w-full rounded-xl p-6 transition duration-500 ease-in-out">
+            <p id="sceneDescription" class="text-lg font-medium text-gray-700 mb-4 h-12 flex items-center justify-center text-center">
+                A common workspace. Three friends—Riya, Aman, and Meena—sit together during a break.
+            </p>
+            <div class="border-t pt-4">
+                <p id="speakerName" class="speaker-tag bg-gray-300 text-gray-800 transition-all duration-300">...</p>
+                <p id="subtitleText" class="subtitle mt-2 italic text-gray-500 transition-all duration-300">
+                    Press START to begin the short video.
+                </p>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <button id="startButton" onclick="startVideo()" class="px-8 py-3 bg-blue-600 text-white font-bold rounded-lg shadow-lg hover:bg-blue-700 transition duration-300 transform hover:scale-105 disabled:opacity-50 flex items-center justify-center space-x-2">
+            <svg id="startIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                <path fill-rule="evenodd" d="M4.5 5.653c0-1.427 1.529-2.33 2.779-1.643l11.54 6.347c1.295.712 1.295 2.573 0 3.286l-11.54 6.347c-1.25.687-2.779-.217-2.779-1.643V5.653Z" clip-rule="evenodd" />
+            </svg>
+            <span id="buttonText">START VIDEO</span>
+        </button>
+
+        <div id="loadingIndicator" class="hidden text-center">
+            <div class="animate-spin inline-block w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full"></div>
+            <p class="text-blue-500 mt-2">Generating audio (This may take a moment)...</p>
+        </div>
+
+        <!-- Audio element to play the generated sound -->
+        <audio id="audioPlayer" controls class="hidden w-full max-w-sm"></audio>
+    </div>
+
+    <script>
+        // --- Configuration and Constants ---
+        const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=";
+        const API_KEY = ""; // Canvas will provide this in runtime
+
+        // Textual Scenes/Dialogue for display during playback
+        const SCENES = [
+            { description: "A common workspace. Riya, Aman, and Meena sit together during a break.", speaker: "Meena", text: "How's everyone really feeling?", duration: 2.5 }, // Duration estimate
+            { description: "Riya looks visibly anxious, stressed by a pile of books.", speaker: "Riya", text: "Honestly, I'm completely overwhelmed. The pressure to succeed in this upcoming presentation feels enormous, and I can't seem to relax.", duration: 6 },
+            { description: "Aman hesitates, looking down, then speaks quietly.", speaker: "Aman", text: "I... I feel pretty isolated lately. The loneliness has made it hard to focus or even want to engage in anything.", duration: 6 },
+            { description: "Meena looks directly at them, holding a small notepad.", speaker: "Meena", text: "Thank you both for sharing. I've dealt with anxiety before, too, and I want you to know: You’re not alone—everyone feels this way sometimes. And it’s certainly not weak to ask for help. Even small things help—like taking a moment for deep breathing, or journaling. We need to start checking in on each other, regularly.", duration: 18 },
+            { description: "The three friends exchange a supportive look.", speaker: "Voiceover", text: "Mental health matters, every day. Speak up, reach out, and support one another—because everyday heroes look out for each other.", duration: 7 }
+        ];
+
+        // Combined TTS prompt
+        const TTS_PROMPT = `
+            Meena: How's everyone really feeling?
+            Riya: Honestly, I'm completely overwhelmed. The pressure to succeed in this upcoming presentation feels enormous, and I can't seem to relax.
+            Aman: I... I feel pretty isolated lately. The loneliness has made it hard to focus or even want to engage in anything.
+            Meena: Thank you both for sharing. I've dealt with anxiety before, too, and I want you to know: You’re not alone—everyone feels this way sometimes. And it’s certainly not weak to ask for help. Even small things help—like taking a moment for deep breathing, or journaling. We need to start checking in on each other, regularly. Mental health matters, every day. Speak up, reach out, and support one another—because everyday heroes look out for each other.
+        `;
+
+        // TTS Multi-Speaker Configuration
+        const TTS_PAYLOAD = {
+            contents: [{ parts: [{ text: TTS_PROMPT.trim() }] }],
+            generationConfig: {
+                responseModalities: ["AUDIO"],
+                speechConfig: {
+                    multiSpeakerVoiceConfig: {
+                        speakerVoiceConfigs: [
+                            { speaker: "Meena", voiceConfig: { prebuiltVoiceConfig: { voiceName: "Puck" } } },    // Upbeat/Friendly
+                            { speaker: "Riya", voiceConfig: { prebuiltVoiceConfig: { voiceName: "Fenrir" } } },     // Excitable/High-energy (to convey stress)
+                            { speaker: "Aman", voiceConfig: { prebuiltVoiceConfig: { voiceName: "Iapetus" } } }     // Clear/Neutral (for withdrawn)
+                            // The final 'Mental health matters...' line is assigned to Meena due to the prompt structure
+                        ]
+                    }
+                }
+            },
+            model: "gemini-2.5-flash-preview-tts"
+        };
+
+
+        // --- DOM Elements ---
+        const startButton = document.getElementById('startButton');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const audioPlayer = document.getElementById('audioPlayer');
+        const sceneDescriptionEl = document.getElementById('sceneDescription');
+        const speakerNameEl = document.getElementById('speakerName');
+        const subtitleTextEl = document.getElementById('subtitleText');
+
+        // --- Utility Functions for PCM to WAV Conversion (required for TTS) ---
+
+        /** Converts a base64 string to an ArrayBuffer. */
+        function base64ToArrayBuffer(base64) {
+            const binaryString = atob(base64);
+            const len = binaryString.length;
+            const bytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            return bytes.buffer;
+        }
+
+        /** Converts PCM (Int16Array) data into a WAV Blob. */
+        function pcmToWav(pcm16, sampleRate = 24000) {
+            const numChannels = 1;
+            const bytesPerSample = 2; // 16-bit PCM
+
+            const buffer = new ArrayBuffer(44 + pcm16.length * bytesPerSample);
+            const view = new DataView(buffer);
+            let offset = 0;
+
+            function writeString(str) {
+                for (let i = 0; i < str.length; i++) {
+                    view.setUint8(offset + i, str.charCodeAt(i));
+                }
+                offset += str.length;
+            }
+
+            function writeUint32(val) {
+                view.setUint32(offset, val, true);
+                offset += 4;
+            }
+
+            function writeUint16(val) {
+                view.setUint16(offset, val, true);
+                offset += 2;
+            }
+
+            // RIFF header
+            writeString('RIFF');
+            writeUint32(36 + pcm16.byteLength); // file length - 8
+            writeString('WAVE');
+
+            // fmt chunk
+            writeString('fmt ');
+            writeUint32(16);             // Subchunk1Size (16 for PCM)
+            writeUint16(1);              // AudioFormat (1 for PCM)
+            writeUint16(numChannels);    // NumChannels
+            writeUint32(sampleRate);     // SampleRate
+            writeUint32(sampleRate * numChannels * bytesPerSample); // ByteRate
+            writeUint16(numChannels * bytesPerSample);              // BlockAlign
+            writeUint16(bytesPerSample * 8); // BitsPerSample (16)
+
+            // data chunk
+            writeString('data');
+            writeUint32(pcm16.byteLength); // Subchunk2Size (Data size)
+
+            // Write PCM data
+            const pcmBytes = new Uint8Array(pcm16.buffer);
+            for (let i = 0; i < pcmBytes.length; i++) {
+                view.setUint8(offset + i, pcmBytes[i]);
+            }
+
+            return new Blob([view], { type: 'audio/wav' });
+        }
+
+        // --- Video Playback Logic ---
+        let currentSceneIndex = 0;
+
+        function updateSceneDisplay(scene) {
+            sceneDescriptionEl.textContent = scene.description;
+            subtitleTextEl.textContent = scene.text;
+
+            // Update speaker tag and color
+            speakerNameEl.className = `speaker-tag transition-all duration-300 speaker-${scene.speaker}`;
+            speakerNameEl.textContent = scene.speaker === 'Voiceover' ? 'Voiceover' : scene.speaker;
+        }
+
+        function advanceScene() {
+            if (currentSceneIndex < SCENES.length) {
+                const scene = SCENES[currentSceneIndex];
+                updateSceneDisplay(scene);
+                currentSceneIndex++;
+            }
+        }
+
+        /**
+         * Simulates the video playback using timeouts based on scene duration.
+         * In a real video, this would be tied to the audio timeline.
+         */
+        function simulatePlayback() {
+            // First scene starts immediately when audio plays
+            advanceScene();
+
+            let totalDelay = 0;
+            for (let i = 0; i < SCENES.length; i++) {
+                // Schedule the next scene update
+                if (i < SCENES.length - 1) {
+                    totalDelay += SCENES[i].duration * 1000;
+                    setTimeout(advanceScene, totalDelay);
+                }
+            }
+        }
+
+        function playAudio(audioBlob) {
+            audioPlayer.src = URL.createObjectURL(audioBlob);
+
+            // Start scene simulation when audio begins playing
+            audioPlayer.onplay = () => {
+                currentSceneIndex = 0; // Reset index to start scenes
+                simulatePlayback();
+            };
+
+            // Reset UI when audio ends
+            audioPlayer.onended = () => {
+                speakerNameEl.textContent = '...';
+                speakerNameEl.className = 'speaker-tag bg-gray-300 text-gray-800 transition-all duration-300';
+                subtitleTextEl.textContent = 'Video complete. Press START to watch again.';
+                sceneDescriptionEl.textContent = 'Thank you for watching.';
+                startButton.disabled = false;
+                document.getElementById('buttonText').textContent = 'WATCH AGAIN';
+            };
+
+            audioPlayer.play().catch(e => {
+                console.error("Audio playback failed, possibly due to browser restrictions:", e);
+                // Fallback message for browsers requiring user interaction first
+                subtitleTextEl.textContent = 'Playback blocked by browser. Please manually press the play button on the hidden controls below.';
+                audioPlayer.classList.remove('hidden');
+                audioPlayer.onplay = () => {
+                    // Start scene simulation if the user manually plays
+                    currentSceneIndex = 0;
+                    simulatePlayback();
+                };
+            });
+        }
+
+        // --- API Call and Orchestration ---
+
+        async function fetchAudioWithBackoff(retries = 0) {
+            const MAX_RETRIES = 5;
+            if (retries > MAX_RETRIES) {
+                throw new Error("Maximum retries reached for API call.");
+            }
+
+            try {
+                const response = await fetch(API_URL + API_KEY, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(TTS_PAYLOAD)
+                });
+
+                if (!response.ok) {
+                    const errorStatus = response.status;
+                    // Log response text for debugging, but don't rely on it for the error message
+                    response.text().then(text => console.error(`API Error Body (${errorStatus}):`, text)).catch(() => {});
+
+                    if (errorStatus === 429) { // Rate limit
+                        const delay = Math.pow(2, retries) * 1000 + Math.random() * 1000;
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        return fetchAudioWithBackoff(retries + 1);
+                    }
+                    // Throw an error with only the status code for robustness
+                    throw new Error(`API returned status ${errorStatus}`);
+                }
+
+                const result = await response.json();
+                const part = result?.candidates?.[0]?.content?.parts?.[0];
+                const audioData = part?.inlineData?.data;
+                const mimeType = part?.inlineData?.mimeType;
+
+                if (audioData && mimeType && mimeType.startsWith("audio/L16")) {
+                    const sampleRateMatch = mimeType.match(/rate=(\d+)/);
+                    const sampleRate = sampleRateMatch ? parseInt(sampleRateMatch[1], 10) : 24000;
+
+                    const pcmData = base64ToArrayBuffer(audioData);
+                    // API returns signed PCM16 audio data.
+                    const pcm16 = new Int16Array(pcmData);
+                    const wavBlob = pcmToWav(pcm16, sampleRate);
+                    return wavBlob;
+                } else {
+                    throw new Error("Invalid or missing audio data in API response.");
+                }
+
+            } catch (error) {
+                console.error("Error during fetch or processing:", error);
+                throw error;
+            }
+        }
+
+        async function startVideo() {
+            startButton.disabled = true;
+            loadingIndicator.classList.remove('hidden');
+            audioPlayer.classList.add('hidden');
+            speakerNameEl.textContent = 'Generating...';
+            subtitleTextEl.textContent = 'Please wait while the voices are synthesized.';
+            sceneDescriptionEl.textContent = 'Setting up the scene...';
+
+            try {
+                const audioBlob = await fetchAudioWithBackoff();
+                loadingIndicator.classList.add('hidden');
+                document.getElementById('buttonText').textContent = 'PLAYING...';
+                playAudio(audioBlob);
+
+            } catch (error) {
+                console.error(error);
+                loadingIndicator.classList.add('hidden');
+                startButton.disabled = false;
+                document.getElementById('buttonText').textContent = 'START VIDEO';
+                speakerNameEl.textContent = 'API Error';
+                
+                let errorMessage = 'Failed to generate audio. Check console for details.';
+                
+                // Inspect the error message thrown by fetchAudioWithBackoff
+                const errorDetail = error.message || String(error);
+
+                if (errorDetail.includes('401')) {
+                    errorMessage = 'Authentication Failed (Status 401). The Text-to-Speech service may not be authorized in this environment.';
+                } else if (errorDetail.includes('429')) {
+                    errorMessage = 'Rate Limit Exceeded (Status 429). Please try again in a moment.';
+                } else if (errorDetail.includes('Maximum retries')) {
+                    errorMessage = 'API failed after multiple retries. Check connectivity or try again later.';
+                }
+                
+                subtitleTextEl.textContent = errorMessage;
+                sceneDescriptionEl.textContent = 'The service encountered an issue.';
+            }
+        }
+
+    </script>
+</body>
+</html>
